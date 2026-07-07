@@ -1,0 +1,197 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════════
+   AGROCROP FRESH — DESIGN TOKENS
+   Palette supplied by the client brief. Do not introduce new hues.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* ── Color: primary dark greens ──────────────────────────────── */
+  --color-forest-950: #0d100b;
+  --color-forest-900: #12160f;
+  --color-forest-800: #1c2417;
+  --color-forest-600: #40573a;
+
+  /* ── Color: natural green ────────────────────────────────────── */
+  --color-sage-300: #a7b39a;
+  --color-sage-200: #c3ccb8; /* derived tint — borders/dividers on dark */
+
+  /* ── Color: earth ────────────────────────────────────────────── */
+  --color-earth-500: #8a7a5c;
+  --color-earth-400: #a3946f; /* derived tint — details on dark */
+
+  /* ── Color: accent (CTA / highlights ONLY) ───────────────────── */
+  --color-ember-400: #de6f45; /* accent text on dark surfaces */
+  --color-ember-500: #c9542e; /* primary accent */
+  --color-ember-600: #a8431f; /* hover / accent text on light surfaces */
+
+  /* ── Color: light backgrounds ────────────────────────────────── */
+  --color-cream-50: #faf9f5;
+  --color-cream-100: #f2f0e8;
+  --color-cream-200: #e8e6df;
+
+  /* ── Color: neutrals ─────────────────────────────────────────── */
+  --color-ink-900: #1c2117;
+  --color-ink-700: #42473d;
+  --color-ink-600: #5a5f52;
+  --color-ink-500: #6a6f60;
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  --font-display: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Instrument Sans Variable', system-ui, -apple-system, sans-serif;
+
+  /* ── Motion ──────────────────────────────────────────────────── */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* ── Layout ──────────────────────────────────────────────────── */
+  --spacing-section: clamp(5.5rem, 11vw, 10rem);
+  --spacing-section-sm: clamp(3.5rem, 7vw, 6rem);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-cream-50 text-ink-900 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-ember-500);
+    color: var(--color-cream-50);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ember-500);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Fraunces display rendering — high optical size, no softness/wonk */
+  h1, h2, h3, .font-display {
+    font-variation-settings: 'opsz' 144, 'SOFT' 0, 'WONK' 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Site container — generous margins, calm 1440px measure on 1920+ */
+@utility container-site {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 4.5vw, 4rem);
+}
+
+/* Vertical rhythm for full sections */
+@utility section-pad {
+  padding-block: var(--spacing-section);
+}
+
+/* Uppercase editorial eyebrow */
+@utility kicker {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* Fluid display sizes (Fraunces) */
+@utility text-display-xl {
+  font-size: clamp(2.875rem, 7vw, 6.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+}
+
+@utility text-display-lg {
+  font-size: clamp(2.25rem, 4.8vw, 4.25rem);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+}
+
+@utility text-display-md {
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  line-height: 1.12;
+  letter-spacing: -0.008em;
+}
+
+/* Body measures */
+@utility text-lede {
+  font-size: clamp(1.0625rem, 1.4vw, 1.3125rem);
+  line-height: 1.65;
+}
+
+/* Hairline rules that match each surface */
+@utility rule-light {
+  border-color: color-mix(in srgb, var(--color-ink-500) 22%, transparent);
+}
+
+@utility rule-dark {
+  border-color: color-mix(in srgb, var(--color-sage-300) 26%, transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOTION GROUNDWORK
+   Initial hidden states apply only when `html.has-motion` is set by
+   the inline head script (i.e. JS will run and reduced-motion is off).
+   ═══════════════════════════════════════════════════════════════════ */
+
+html.has-motion [data-reveal],
+html.has-motion [data-reveal-group] > *,
+html.has-motion [data-hero] {
+  opacity: 0;
+}
+
+html.has-motion [data-split] {
+  visibility: hidden;
+}
+
+html.has-motion [data-hero-line] {
+  transform: translateY(112%);
+}
+
+/* Filmic grain overlay for video/photo surfaces */
+@utility grain {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+}
+
+/* Prevent long-word overflow in Serbian copy on small screens */
+@utility text-balance {
+  text-wrap: balance;
+}

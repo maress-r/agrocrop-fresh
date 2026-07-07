@@ -1,0 +1,51 @@
+---
+/**
+ * Primary interactive element. Renders <a> when href is given,
+ * otherwise <button>.
+ */
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'ghost-light' | 'ghost-dark';
+  size?: 'md' | 'lg';
+  type?: 'button' | 'submit';
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  type = 'button',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const Tag = href ? 'a' : 'button';
+
+const base =
+  'group/btn relative inline-flex cursor-pointer items-center justify-center gap-2.5 overflow-hidden rounded-full font-sans font-medium transition-[background-color,border-color,color,transform,box-shadow] duration-300 ease-(--ease-out-quart) active:scale-[0.98] select-none';
+
+const sizes = {
+  md: 'h-12 px-7 text-[0.9375rem]',
+  lg: 'h-14 px-9 text-base',
+};
+
+const variants = {
+  primary:
+    'bg-ember-500 text-cream-50 hover:bg-ember-600 shadow-[0_1px_2px_rgba(13,16,11,0.2)] hover:shadow-[0_10px_30px_-10px_rgba(201,84,46,0.55)] hover:-translate-y-0.5',
+  'ghost-light':
+    'border border-cream-50/35 text-cream-50 hover:border-cream-50/90 hover:bg-cream-50/10 hover:-translate-y-0.5',
+  'ghost-dark':
+    'border border-ink-900/25 text-ink-900 hover:border-ink-900/70 hover:bg-forest-900/5 hover:-translate-y-0.5',
+};
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={[base, sizes[size], variants[variant], className]}
+  {...rest}
+>
+  <slot />
+</Tag>

@@ -1,0 +1,144 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import Button from '../ui/Button.astro';
+import { getDictionary, type Locale } from '../../i18n';
+import { site } from '../../config/site';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+
+const inputClass =
+  'w-full rounded-lg border rule-dark bg-cream-50/[0.04] px-4 text-[0.9375rem] text-cream-50 placeholder:text-sage-300/45 transition-[border-color,background-color] duration-300 focus:border-ember-400 focus:bg-cream-50/[0.07] focus:outline-none';
+const labelClass = 'mb-2 block text-[0.8125rem] font-medium tracking-[0.04em] text-sage-200';
+---
+
+<section id="contact" class="section-pad bg-forest-950 text-cream-50">
+  <div class="container-site">
+    <SectionHead
+      number="07"
+      kicker={t.contact.kicker}
+      title={t.contact.title}
+      lede={t.contact.lede}
+      tone="dark"
+    />
+
+    <div class="mt-16 grid gap-16 md:mt-24 lg:grid-cols-[1.15fr_1fr] lg:gap-24">
+      <!-- Form: composes a pre-filled e-mail (static hosting, no backend). -->
+      <form id="inquiry-form" class="flex flex-col gap-6" novalidate data-reveal>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="f-name" class={labelClass}>{t.contact.form.name} *</label>
+            <input id="f-name" name="name" type="text" required autocomplete="name" class:list={[inputClass, 'h-12']} />
+          </div>
+          <div>
+            <label for="f-company" class={labelClass}>{t.contact.form.company}</label>
+            <input id="f-company" name="company" type="text" autocomplete="organization" class:list={[inputClass, 'h-12']} />
+          </div>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="f-email" class={labelClass}>{t.contact.form.email} *</label>
+            <input id="f-email" name="email" type="email" required autocomplete="email" class:list={[inputClass, 'h-12']} />
+          </div>
+          <div>
+            <label for="f-phone" class={labelClass}>{t.contact.form.phone}</label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel" class:list={[inputClass, 'h-12']} />
+          </div>
+        </div>
+        <div>
+          <label for="f-message" class={labelClass}>{t.contact.form.message} *</label>
+          <textarea
+            id="f-message"
+            name="message"
+            required
+            rows="5"
+            placeholder={t.contact.form.messagePlaceholder}
+            class:list={[inputClass, 'resize-y py-3.5']}></textarea>
+        </div>
+        <div class="mt-2 flex flex-col gap-4">
+          <Button type="submit" size="lg" class="md:self-start">{t.contact.form.submit}</Button>
+          <p class="text-[0.8125rem] text-sage-300/70">{t.contact.form.note}</p>
+        </div>
+      </form>
+
+      <!-- Direct contact info -->
+      <div class="flex flex-col gap-10" data-reveal-group>
+        <div>
+          <h3 class="kicker mb-5 text-sage-300/80">{t.contact.salesHeading}</h3>
+          <div class="flex flex-col gap-5">
+            {
+              site.contacts.map((c) => (
+                <p class="text-[1rem]">
+                  <span class="text-sage-200">{c.name}</span>
+                  <a
+                    href={`tel:${c.phoneHref}`}
+                    class="mt-1 block w-fit font-display text-[1.5rem] font-[500] text-cream-50 transition-colors duration-300 hover:text-ember-400"
+                  >
+                    {c.phone}
+                  </a>
+                </p>
+              ))
+            }
+            <a
+              href={`mailto:${site.email.office}`}
+              class="w-fit font-display text-[1.35rem] font-[500] text-cream-50 underline decoration-ember-500/60 decoration-1 underline-offset-8 transition-colors duration-300 hover:text-ember-400"
+            >
+              {site.email.office}
+            </a>
+          </div>
+        </div>
+
+        <div class="border-t rule-dark pt-8">
+          <h3 class="kicker mb-4 text-sage-300/80">{t.contact.hqHeading}</h3>
+          <p class="text-[1rem] leading-relaxed text-cream-50/85">
+            {site.company.legalName}
+            <br />
+            {site.address.headquarters.street}, {site.address.headquarters.city}
+          </p>
+        </div>
+
+        <div class="border-t rule-dark pt-8">
+          <h3 class="kicker mb-4 text-sage-300/80">{t.contact.productionHeading}</h3>
+          <p class="text-[1rem] leading-relaxed text-cream-50/85">{t.contact.productionValue}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  /**
+   * Static-hosting form: composes a pre-filled mailto message.
+   * ⚠️ The destination address lives in src/config/site.ts (site.email.office).
+   */
+  import { site } from '../../config/site';
+
+  const form = document.getElementById('inquiry-form') as HTMLFormElement;
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const data = new FormData(form);
+    const isSerbian = document.documentElement.lang.startsWith('sr');
+
+    const lines = [
+      `${isSerbian ? 'Ime' : 'Name'}: ${data.get('name')}`,
+      `${isSerbian ? 'Kompanija' : 'Company'}: ${data.get('company') || '—'}`,
+      `E-mail: ${data.get('email')}`,
+      `${isSerbian ? 'Telefon' : 'Phone'}: ${data.get('phone') || '—'}`,
+      '',
+      `${data.get('message')}`,
+    ];
+
+    const subject = isSerbian
+      ? 'Upit za ponudu — Agrocrop Fresh'
+      : 'Quote request — Agrocrop Fresh';
+
+    window.location.href = `mailto:${site.email.office}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+  });
+</script>

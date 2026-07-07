@@ -1,0 +1,64 @@
+---
+import SectionHead from '../ui/SectionHead.astro';
+import { getDictionary, type Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+
+/**
+ * Minimal 24px stroke icons, one per pillar, drawn in a single
+ * consistent 1.5px-stroke language (certificate, leaf, snowflake, route).
+ */
+const icons = [
+  // certificate rosette
+  `<circle cx="12" cy="9" r="5.25"/><path d="M9.6 13.4 8.2 20.6l3.8-2.1 3.8 2.1-1.4-7.2"/>`,
+  // leaf
+  `<path d="M4.5 19.5C4.5 11.5 10 4.9 19.5 4.5c-.6 9.8-6.6 15-15 15Z"/><path d="M4.5 19.5C8.5 15 12 11.5 16 8.5"/>`,
+  // snowflake
+  `<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/>`,
+  // route
+  `<circle cx="5" cy="6" r="2.25"/><circle cx="19" cy="18" r="2.25"/><path d="M7.25 6H15a3.5 3.5 0 0 1 0 7H9a3.5 3.5 0 0 0 0 7h7.75"/>`,
+];
+---
+
+<section id="quality" class="section-pad bg-forest-800 text-cream-50">
+  <div class="container-site">
+    <SectionHead
+      number="04"
+      kicker={t.quality.kicker}
+      title={t.quality.title}
+      lede={t.quality.lede}
+      tone="dark"
+    />
+
+    <ul class="mt-16 grid gap-5 md:mt-24 md:grid-cols-2 xl:grid-cols-4" data-reveal-group>
+      {
+        t.quality.pillars.map((pillar, i) => (
+          <li class="group flex flex-col gap-5 rounded-2xl border rule-dark bg-forest-900/40 p-8 transition-[border-color,transform,background-color] duration-400 ease-(--ease-out-quart) hover:-translate-y-1.5 hover:border-sage-300/45 hover:bg-forest-900/70">
+            <span
+              class="text-sage-300 transition-colors duration-400 group-hover:text-ember-400"
+              aria-hidden="true"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-9 w-9"
+                set:html={icons[i] ?? icons[0]}
+              />
+            </span>
+            <h3 class="font-display text-[1.4rem] leading-snug font-[550]">{pillar.title}</h3>
+            <p class="text-[0.9375rem] leading-relaxed text-sage-200/90">{pillar.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

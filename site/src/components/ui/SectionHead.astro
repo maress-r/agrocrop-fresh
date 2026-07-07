@@ -1,0 +1,52 @@
+---
+/**
+ * Editorial section opener: numbered kicker → display title → lede.
+ */
+interface Props {
+  number: string;
+  kicker: string;
+  title: string;
+  lede?: string;
+  tone?: 'light' | 'dark';
+  /** max-width utility for the title block */
+  titleClass?: string;
+  class?: string;
+}
+
+const {
+  number,
+  kicker,
+  title,
+  lede,
+  tone = 'light',
+  titleClass = 'max-w-3xl',
+  class: className = '',
+} = Astro.props;
+
+const kickerColor = tone === 'light' ? 'text-ink-600' : 'text-sage-300';
+const numberColor = tone === 'light' ? 'text-ember-600' : 'text-ember-400';
+const titleColor = tone === 'light' ? 'text-ink-900' : 'text-cream-50';
+const ledeColor = tone === 'light' ? 'text-ink-600' : 'text-sage-200';
+const ruleColor = tone === 'light' ? 'bg-ink-900/15' : 'bg-cream-50/20';
+---
+
+<div class:list={['flex flex-col gap-6 md:gap-8', className]}>
+  <p class:list={['kicker flex items-center gap-4', kickerColor]} data-reveal>
+    <span class:list={['font-medium', numberColor]}>{number}</span>
+    <span class:list={['h-px w-10', ruleColor]} aria-hidden="true"></span>
+    <span>{kicker}</span>
+  </p>
+  <h2
+    class:list={['font-display text-display-lg font-[550] text-balance', titleColor, titleClass]}
+    data-split
+  >
+    {title}
+  </h2>
+  {
+    lede && (
+      <p class:list={['text-lede max-w-2xl', ledeColor]} data-reveal data-reveal-delay="0.15">
+        {lede}
+      </p>
+    )
+  }
+</div>

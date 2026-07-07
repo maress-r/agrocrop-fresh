@@ -1,0 +1,234 @@
+---
+import Logo from './Logo.astro';
+import Button from './ui/Button.astro';
+import { getDictionary, localePath, alternatePath, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const home = localePath(locale);
+
+const links = [
+  { href: `${home}#story`, label: t.nav.story },
+  { href: `${home}#production`, label: t.nav.production },
+  { href: `${home}#products`, label: t.nav.products },
+  { href: `${home}#quality`, label: t.nav.quality },
+  { href: `${home}#gallery`, label: t.nav.gallery },
+  { href: `${home}#contact`, label: t.nav.contact },
+];
+---
+
+<header
+  id="site-header"
+  class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ease-(--ease-out-quart)"
+>
+  <div class="container-site flex h-20 items-center justify-between gap-6 md:h-24">
+    <a
+      href={home || '/'}
+      class="text-[1.05rem] text-cream-50 transition-opacity duration-300 hover:opacity-85 md:text-[1.15rem]"
+      aria-label="Agrocrop Fresh"
+    >
+      <Logo />
+    </a>
+
+    <nav class="hidden items-center gap-8 lg:flex" aria-label="Main">
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            class="nav-link relative text-[0.9rem] font-medium tracking-[0.01em] text-cream-50/85 transition-colors duration-300 hover:text-cream-50"
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-3 md:gap-5">
+      <a
+        href={alternatePath(locale)}
+        class="rounded-full px-2 py-1 text-[0.8125rem] font-semibold tracking-[0.14em] text-cream-50/70 uppercase transition-colors duration-300 hover:text-cream-50"
+        aria-label={t.a11y.langSwitch}
+      >
+        {t.a11y.langSwitchShort}
+      </a>
+
+      <Button href={`${home}#contact`} class="hidden md:inline-flex">
+        {t.nav.cta}
+      </Button>
+
+      <button
+        id="menu-toggle"
+        type="button"
+        class="relative z-[70] flex h-11 w-11 cursor-pointer flex-col items-center justify-center gap-[7px] lg:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        aria-label={t.a11y.openMenu}
+        data-label-open={t.a11y.openMenu}
+        data-label-close={t.a11y.closeMenu}
+      >
+        <span class="menu-bar h-px w-6 bg-cream-50 transition-transform duration-400 ease-(--ease-out-quart)"></span>
+        <span class="menu-bar h-px w-6 bg-cream-50 transition-opacity duration-300"></span>
+        <span class="menu-bar h-px w-6 bg-cream-50 transition-transform duration-400 ease-(--ease-out-quart)"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div
+    id="mobile-menu"
+    class="pointer-events-none fixed inset-0 z-[60] flex flex-col justify-between bg-forest-950/0 pt-28 pb-10 opacity-0 transition-[opacity,background-color] duration-500 ease-(--ease-out-quart) lg:hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu"
+    inert
+  >
+    <nav class="container-site flex flex-col gap-1" aria-label="Mobile">
+      {
+        links.map((link, i) => (
+          <a
+            href={link.href}
+            class="menu-item border-b border-cream-50/10 py-4 font-display text-[1.75rem] font-[500] text-cream-50 transition-colors duration-300 hover:text-ember-400"
+            style={`--i: ${i}`}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="container-site menu-item" style={`--i: ${links.length}`}>
+      <Button href={`${home}#contact`} size="lg" class="w-full">
+        {t.nav.cta}
+      </Button>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* Scrolled state — dark glass */
+  :global(#site-header.is-scrolled) {
+    background-color: color-mix(in srgb, var(--color-forest-950) 82%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-sage-300) 14%, transparent);
+  }
+
+  /* Underline grow-in for desktop nav */
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    height: 1px;
+    width: 100%;
+    background: var(--color-ember-400);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s var(--ease-out-quart);
+  }
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  /* Open state */
+  :global(#site-header.menu-open) #mobile-menu {
+    pointer-events: auto;
+    opacity: 1;
+    background-color: color-mix(in srgb, var(--color-forest-950) 97%, transparent);
+  }
+
+  .menu-item {
+    opacity: 0;
+    transform: translateY(1.25rem);
+    transition:
+      opacity 0.5s var(--ease-out-quart),
+      transform 0.5s var(--ease-out-quart);
+    transition-delay: 0s;
+  }
+  :global(#site-header.menu-open) .menu-item {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(0.08s + var(--i) * 0.05s);
+  }
+
+  :global(#site-header.menu-open) .menu-bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  :global(#site-header.menu-open) .menu-bar:nth-child(2) {
+    opacity: 0;
+  }
+  :global(#site-header.menu-open) .menu-bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* Without motion preference, no reveal transitions inside menu */
+  @media (prefers-reduced-motion: reduce) {
+    .menu-item {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.getElementById('site-header')!;
+  const toggle = document.getElementById('menu-toggle')!;
+  const menu = document.getElementById('mobile-menu')!;
+
+  /* ── Scroll state ──────────────────────────────────────────── */
+  let ticking = false;
+  const updateScrollState = () => {
+    header.classList.toggle('is-scrolled', window.scrollY > 24);
+    ticking = false;
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateScrollState);
+      }
+    },
+    { passive: true }
+  );
+  updateScrollState();
+
+  /* ── Mobile menu ───────────────────────────────────────────── */
+  let lastFocused: HTMLElement | null = null;
+
+  const setOpen = (open: boolean) => {
+    header.classList.toggle('menu-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute(
+      'aria-label',
+      open ? toggle.dataset.labelClose! : toggle.dataset.labelOpen!
+    );
+    if (open) {
+      lastFocused = document.activeElement as HTMLElement;
+      menu.removeAttribute('inert');
+      document.body.style.overflow = 'hidden';
+      (menu.querySelector('a') as HTMLElement | null)?.focus();
+    } else {
+      menu.setAttribute('inert', '');
+      document.body.style.overflow = '';
+      lastFocused?.focus();
+    }
+  };
+
+  const isOpen = () => header.classList.contains('menu-open');
+
+  toggle.addEventListener('click', () => setOpen(!isOpen()));
+
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen()) setOpen(false);
+  });
+</script>

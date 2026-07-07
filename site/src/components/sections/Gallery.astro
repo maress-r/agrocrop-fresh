@@ -1,0 +1,165 @@
+---
+import { Image, getImage } from 'astro:assets';
+import SectionHead from '../ui/SectionHead.astro';
+import { getDictionary, type Locale } from '../../i18n';
+
+import aerialComplex from '../../assets/photos/aerial-complex.jpg';
+import greenhouseRows from '../../assets/photos/greenhouse-rows.jpg';
+import baburaVine from '../../assets/photos/babura-vine.jpg';
+import siljaCrates from '../../assets/photos/silja-crates.jpg';
+import seedlingHand from '../../assets/photos/seedling-hand.jpg';
+import exportBoxes from '../../assets/photos/export-babura-boxes.jpg';
+import baburaPlants from '../../assets/photos/babura-plants-2.jpg';
+import siljaVine from '../../assets/photos/silja-2.jpg';
+import aerialHaze from '../../assets/photos/aerial-haze.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const sr = locale === 'sr';
+
+const photos = [
+  { src: aerialComplex, alt: sr ? 'Kompleks plastenika iz vazduha' : 'Greenhouse complex from the air' },
+  { src: baburaVine, alt: sr ? 'Bela babura na biljci' : 'White babura peppers on the plant' },
+  { src: greenhouseRows, alt: sr ? 'Unutrašnjost plastenika sa redovima paprike' : 'Greenhouse interior with rows of peppers' },
+  { src: siljaCrates, alt: sr ? 'Šilja paprika u gajbicama' : 'Šilja peppers in crates' },
+  { src: seedlingHand, alt: sr ? 'Rasad paprike u ruci' : 'Pepper seedling in hand' },
+  { src: exportBoxes, alt: sr ? 'Spakovane kutije za izvoz' : 'Boxes packed for export' },
+  { src: baburaPlants, alt: sr ? 'Babura paprika pred berbu' : 'Babura peppers before harvest' },
+  { src: siljaVine, alt: sr ? 'Šilja paprika u zasadu' : 'Šilja peppers in the crop' },
+  { src: aerialHaze, alt: sr ? 'Plastenici u jutarnjoj izmaglici' : 'Greenhouses in morning haze' },
+];
+
+/** Pre-render large versions for the lightbox. */
+const fullSizes = await Promise.all(
+  photos.map((p) => getImage({ src: p.src, width: 1800, format: 'webp', quality: 78 }))
+);
+---
+
+<section id="gallery" class="section-pad bg-cream-100">
+  <div class="container-site">
+    <SectionHead number="06" kicker={t.gallery.kicker} title={t.gallery.title} />
+
+    <div class="mt-14 columns-2 gap-4 md:mt-20 md:gap-5 lg:columns-3" data-reveal-group>
+      {
+        photos.map((photo, i) => (
+          <button
+            type="button"
+            class="group mb-4 block w-full cursor-zoom-in overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ember-500 md:mb-5"
+            data-lightbox-trigger={i}
+            data-full={fullSizes[i]!.src}
+            aria-label={`${t.a11y.galleryOpen}: ${photo.alt}`}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[420, 640, 960]}
+              sizes="(min-width: 1024px) 30vw, 46vw"
+              class="w-full transition-transform duration-700 ease-(--ease-out-quart) group-hover:scale-[1.045]"
+            />
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<dialog
+  id="lightbox"
+  class="m-auto max-h-[100dvh] max-w-[100vw] bg-transparent p-0 backdrop:bg-forest-950/95"
+>
+  <div class="flex h-dvh w-screen flex-col items-center justify-center gap-4 p-4 md:p-10">
+    <img
+      id="lightbox-img"
+      src=""
+      alt=""
+      class="max-h-[82dvh] max-w-full rounded-lg object-contain shadow-2xl"
+    />
+    <p id="lightbox-caption" class="max-w-xl text-center text-sm text-sage-200"></p>
+
+    <button
+      type="button"
+      id="lightbox-close"
+      class="absolute top-4 right-4 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-cream-50/25 text-cream-50 transition-colors hover:border-cream-50/70 md:top-6 md:right-6"
+      aria-label={t.a11y.lightboxClose}
+    >
+      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+        <path d="M5 5l14 14M19 5L5 19" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      id="lightbox-prev"
+      class="absolute top-1/2 left-2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream-50/25 text-cream-50 transition-colors hover:border-cream-50/70 md:left-6"
+      aria-label={t.a11y.lightboxPrev}
+    >
+      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
+    </button>
+
+    <button
+      type="button"
+      id="lightbox-next"
+      class="absolute top-1/2 right-2 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-cream-50/25 text-cream-50 transition-colors hover:border-cream-50/70 md:right-6"
+      aria-label={t.a11y.lightboxNext}
+    >
+      <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 5l7 7-7 7" />
+      </svg>
+    </button>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement;
+  const img = document.getElementById('lightbox-img') as HTMLImageElement;
+  const caption = document.getElementById('lightbox-caption')!;
+  const triggers = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-lightbox-trigger]')
+  );
+
+  let index = 0;
+
+  const show = (i: number) => {
+    index = (i + triggers.length) % triggers.length;
+    const trigger = triggers[index]!;
+    const alt = trigger.querySelector('img')?.alt ?? '';
+    img.src = trigger.dataset.full!;
+    img.alt = alt;
+    caption.textContent = alt;
+  };
+
+  triggers.forEach((trigger, i) => {
+    trigger.addEventListener('click', () => {
+      show(i);
+      dialog.showModal();
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  const close = () => dialog.close();
+  dialog.addEventListener('close', () => {
+    document.body.style.overflow = '';
+    triggers[index]?.focus();
+  });
+
+  document.getElementById('lightbox-close')!.addEventListener('click', close);
+  document.getElementById('lightbox-prev')!.addEventListener('click', () => show(index - 1));
+  document.getElementById('lightbox-next')!.addEventListener('click', () => show(index + 1));
+
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(index - 1);
+    if (e.key === 'ArrowRight') show(index + 1);
+  });
+
+  /* Click on backdrop closes */
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+</script>

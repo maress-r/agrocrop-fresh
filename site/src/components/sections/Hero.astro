@@ -1,0 +1,103 @@
+---
+import Button from '../ui/Button.astro';
+import { getDictionary, localePath, type Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+const home = localePath(locale);
+---
+
+<section class="relative flex min-h-[100svh] items-end overflow-hidden bg-forest-950" id="hero">
+  <!-- Background video -->
+  <div class="absolute inset-0" data-hero-zoom>
+    <video
+      class="h-full w-full object-cover"
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      poster="/videos/hero-poster.jpg"
+      aria-label={t.a11y.heroVideoLabel}
+      data-viewport-play
+    >
+      <source src="/videos/hero.webm" type="video/webm" />
+      <source src="/videos/hero.mp4" type="video/mp4" />
+    </video>
+  </div>
+
+  <!-- Overlays: readability gradient + filmic grain -->
+  <div
+    class="absolute inset-0 bg-gradient-to-t from-forest-950/95 via-forest-950/30 to-forest-950/60"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="grain absolute inset-0" aria-hidden="true"></div>
+
+  <!-- Content -->
+  <div class="container-site relative z-10 pt-44 pb-[clamp(5.5rem,12vh,8.5rem)]">
+    <p class="kicker mb-7 text-sage-200/95" data-hero>{t.hero.kicker}</p>
+
+    <h1 class="font-display text-display-xl font-[560] text-cream-50">
+      <span class="block overflow-hidden pb-[0.08em] -mb-[0.08em]">
+        <span class="block will-change-transform" data-hero-line>{t.hero.titleLine1}</span>
+      </span>
+      <span class="block overflow-hidden pb-[0.12em]">
+        <span class="block will-change-transform" data-hero-line>{t.hero.titleLine2}</span>
+      </span>
+    </h1>
+
+    <p class="text-lede mt-6 max-w-xl text-cream-100/90" data-hero>
+      {t.hero.lede}
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center gap-4" data-hero>
+      <Button href={`${home}#contact`} size="lg">{t.hero.ctaPrimary}</Button>
+      <Button href={`${home}#products`} size="lg" variant="ghost-light">
+        {t.hero.ctaSecondary}
+      </Button>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div
+    class="absolute bottom-7 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-3 md:flex"
+    data-hero
+    aria-hidden="true"
+  >
+    <span class="kicker !text-[0.6875rem] text-cream-50/60">{t.hero.scroll}</span>
+    <span class="scroll-line relative block h-12 w-px overflow-hidden bg-cream-50/20">
+      <span class="scroll-dot absolute top-0 left-0 h-3 w-px bg-ember-400"></span>
+    </span>
+  </div>
+</section>
+
+<style>
+  @keyframes scroll-travel {
+    0% {
+      transform: translateY(-0.75rem);
+      opacity: 0;
+    }
+    35% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(3rem);
+      opacity: 0;
+    }
+  }
+
+  .scroll-dot {
+    animation: scroll-travel 2.2s var(--ease-in-out-quart) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-dot {
+      animation: none;
+      top: 50%;
+    }
+  }
+</style>

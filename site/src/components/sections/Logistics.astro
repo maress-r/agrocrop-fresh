@@ -1,0 +1,85 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from '../ui/SectionHead.astro';
+import { getDictionary, type Locale } from '../../i18n';
+
+import exportBoxes from '../../assets/photos/export-babura-boxes.jpg';
+import packingSilja from '../../assets/photos/packing-silja.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+---
+
+<section id="logistics" class="section-pad bg-cream-50">
+  <div class="container-site">
+    <SectionHead
+      number="05"
+      kicker={t.logistics.kicker}
+      title={t.logistics.title}
+      lede={t.logistics.lede}
+    />
+
+    <div class="mt-16 grid gap-14 md:mt-24 lg:grid-cols-2 lg:gap-24">
+      <!-- Numbered points -->
+      <ol class="flex flex-col" data-reveal-group>
+        {
+          t.logistics.points.map((point, i) => (
+            <li
+              class:list={[
+                'flex gap-7 border-t border-ink-900/12 py-8 md:gap-10 md:py-10',
+                i === t.logistics.points.length - 1 && 'border-b',
+              ]}
+            >
+              <span class="font-display text-[1.75rem] leading-none font-[500] text-ember-600 tabular-nums md:text-[2rem]">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div>
+                <h3 class="font-display text-[1.5rem] leading-snug font-[550] text-ink-900">
+                  {point.title}
+                </h3>
+                <p class="mt-2.5 max-w-lg text-[1rem] leading-relaxed text-ink-600">
+                  {point.text}
+                </p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+
+      <!-- Imagery collage -->
+      <div class="relative pb-14 lg:pb-20">
+        <figure class="overflow-hidden rounded-2xl" data-reveal>
+          <Image
+            src={exportBoxes}
+            alt={locale === 'sr'
+              ? 'Spakovana babura paprika u izvoznim kutijama'
+              : 'Packed babura peppers in export boxes'}
+            widths={[560, 900, 1400]}
+            sizes="(min-width: 1024px) 46vw, 92vw"
+            class="aspect-[4/3] w-full scale-[1.06] object-cover"
+            data-parallax="4"
+          />
+        </figure>
+        <figure
+          class="absolute right-0 -bottom-0 w-[46%] overflow-hidden rounded-xl shadow-[0_24px_60px_-24px_rgba(13,16,11,0.45)] md:-right-4"
+          data-reveal
+          data-reveal-delay="0.2"
+        >
+          <Image
+            src={packingSilja}
+            alt={locale === 'sr'
+              ? 'Šilja paprika spremna za isporuku'
+              : 'Šilja peppers ready for dispatch'}
+            widths={[380, 640]}
+            sizes="(min-width: 1024px) 24vw, 46vw"
+            class="aspect-[5/4] w-full object-cover"
+          />
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>

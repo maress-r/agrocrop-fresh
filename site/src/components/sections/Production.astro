@@ -1,0 +1,71 @@
+---
+import { Image } from 'astro:assets';
+import SectionHead from '../ui/SectionHead.astro';
+import { getDictionary, type Locale } from '../../i18n';
+
+import aerialComplex from '../../assets/photos/aerial-complex.jpg';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = getDictionary(locale);
+
+/** Strip separators so counters animate the raw number. */
+const rawValue = (v: string) => v.replace(/[.,\s]/g, '');
+---
+
+<section id="production" class="section-pad bg-forest-900 text-cream-50">
+  <div class="container-site">
+    <SectionHead
+      number="02"
+      kicker={t.production.kicker}
+      title={t.production.title}
+      lede={t.production.lede}
+      tone="dark"
+    />
+
+    <!-- Stats -->
+    <dl class="mt-16 grid grid-cols-2 gap-x-8 gap-y-12 md:mt-24 lg:grid-cols-4" data-reveal-group>
+      {
+        t.production.stats.map((stat) => (
+          <div class="border-t rule-dark pt-6">
+            <dd class="font-display text-[clamp(2.75rem,5vw,4.25rem)] leading-none font-[560]">
+              <span data-counter={rawValue(stat.value)}>{stat.value}</span>
+              <span class="ml-1 text-[0.45em] font-[480] text-sage-300">{stat.suffix}</span>
+            </dd>
+            <dt class="mt-3 max-w-[16rem] text-[0.9375rem] leading-snug text-sage-200/90">
+              {stat.label}
+            </dt>
+          </div>
+        ))
+      }
+    </dl>
+
+    <!-- Biological protection feature -->
+    <div class="mt-20 grid items-center gap-12 md:mt-28 lg:grid-cols-2 lg:gap-20">
+      <figure class="overflow-hidden rounded-2xl" data-reveal>
+        <Image
+          src={aerialComplex}
+          alt={locale === 'sr'
+            ? 'Kompleks plastenika iz vazduha'
+            : 'Aerial view of the greenhouse complex'}
+          widths={[560, 900, 1400]}
+          sizes="(min-width: 1024px) 46vw, 92vw"
+          class="aspect-[16/10] w-full scale-[1.06] object-cover"
+          data-parallax="5"
+        />
+      </figure>
+      <div>
+        <h3 class="font-display text-display-md font-[550]" data-split>
+          {t.production.bioTitle}
+        </h3>
+        <p class="text-lede mt-5 max-w-xl text-sage-200" data-reveal>
+          {t.production.bioText}
+        </p>
+        <div class="mt-8 h-px w-24 bg-ember-500" data-reveal aria-hidden="true"></div>
+      </div>
+    </div>
+  </div>
+</section>

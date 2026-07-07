@@ -1,0 +1,24 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/sections/Hero.astro';
+import Story from '../components/sections/Story.astro';
+import Production from '../components/sections/Production.astro';
+import Products from '../components/sections/Products.astro';
+import Quality from '../components/sections/Quality.astro';
+import Logistics from '../components/sections/Logistics.astro';
+import Gallery from '../components/sections/Gallery.astro';
+import Contact from '../components/sections/Contact.astro';
+
+const locale = 'sr' as const;
+---
+
+<Base locale={locale}>
+  <Hero locale={locale} />
+  <Story locale={locale} />
+  <Production locale={locale} />
+  <Products locale={locale} />
+  <Quality locale={locale} />
+  <Logistics locale={locale} />
+  <Gallery locale={locale} />
+  <Contact locale={locale} />
+</Base>
