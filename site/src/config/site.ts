@@ -9,7 +9,7 @@ export const site = {
   /**
    * ⚠️  EDIT ME — production domain (also update astro.config.mjs).
    */
-  url: 'https://agrocropfresh.rs',
+  url: "https://agrocropfresh.rs",
 
   /**
    * ⚠️  EDIT ME — e-mail addresses are GENERIC PLACEHOLDERS.
@@ -19,35 +19,44 @@ export const site = {
    *   - Contact form delivery target
    */
   email: {
-    office: 'office@agrocropfresh.rs',
-    sales: 'prodaja@agrocropfresh.rs',
+    office: "agrocropfresh@gmail.com",
+    sales: "prodaja@agrocropfresh.rs",
   },
 
   company: {
-    brand: 'Agrocrop Fresh',
-    legalName: 'Agrocrop Fresh d.o.o. za trgovinu i usluge u poljoprivredi Novi Sad',
+    brand: "Agrocrop Fresh",
+    legalName:
+      "Agrocrop Fresh d.o.o. za trgovinu i usluge u poljoprivredi Novi Sad",
     founded: 2012,
     farmSince: 1975,
-    registrationNumber: '20798645', // Matični broj
-    taxId: '107421000', // PIB
+    registrationNumber: "20798645", // Matični broj
+    taxId: "107421000", // PIB
   },
 
   address: {
     headquarters: {
-      street: 'Bulevar oslobođenja 66b',
-      city: 'Novi Sad',
-      country: 'Srbija',
-      countryEn: 'Serbia',
+      street: "Bulevar oslobođenja 66b",
+      city: "Novi Sad",
+      country: "Srbija",
+      countryEn: "Serbia",
     },
     production: {
-      city: 'Pećinci',
-      region: 'Srem, Vojvodina',
+      city: "Pećinci",
+      region: "Srem, Vojvodina",
     },
   },
 
   contacts: [
-    { name: 'Sonja Đurđević', phone: '+381 64 854 17 82', phoneHref: '+381648541782' },
-    { name: 'Aleksandar Đurđević', phone: '+381 64 882 22 40', phoneHref: '+381648822240' },
+    {
+      name: "Sonja Đurđević",
+      phone: "+381 64 854 17 82",
+      phoneHref: "+381648541782",
+    },
+    {
+      name: "Aleksandar Đurđević",
+      phone: "+381 64 882 22 40",
+      phoneHref: "+381648822240",
+    },
   ],
 
   stats: {

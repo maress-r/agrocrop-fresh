@@ -1,10 +1,7 @@
 ---
-import { Image } from 'astro:assets';
 import SectionHead from '../ui/SectionHead.astro';
+import PepperPlant from '../PepperPlant.astro';
 import { getDictionary, type Locale } from '../../i18n';
-
-import seedlingHand from '../../assets/photos/seedling-hand.jpg';
-import greenhouseRows from '../../assets/photos/greenhouse-rows.jpg';
 
 interface Props {
   locale: Locale;
@@ -14,69 +11,39 @@ const { locale } = Astro.props;
 const t = getDictionary(locale);
 ---
 
-<section id="story" class="section-pad bg-cream-50">
+<section id="story" class="story bg-cream-100 pt-(--spacing-section)" data-scroll-camera>
   <div class="container-site">
-    <SectionHead
-      number="01"
-      kicker={t.story.kicker}
-      title={t.story.title}
-      lede={t.story.lede}
-    />
+    <SectionHead number="01" kicker={t.story.kicker} title={t.story.title} titleClass="max-w-4xl" />
+  </div>
 
-    <div class="mt-16 grid gap-14 md:mt-24 lg:grid-cols-[1fr_1.15fr] lg:gap-24">
-      <!-- Imagery column -->
-      <div class="relative order-2 lg:order-1">
-        <div class="flex flex-col gap-6 lg:sticky lg:top-32">
-          <figure class="overflow-hidden rounded-2xl" data-reveal>
-            <Image
-              src={seedlingHand}
-              alt={locale === 'sr'
-                ? 'Rasad paprike u ruci, staklenik u pozadini'
-                : 'Pepper seedling held in hand, greenhouse in the background'}
-              widths={[480, 760, 1100]}
-              sizes="(min-width: 1024px) 42vw, 92vw"
-              class="aspect-[4/5] w-full scale-[1.06] object-cover md:aspect-[3/4]"
-              data-parallax="4"
-            />
-          </figure>
-          <figure class="hidden overflow-hidden rounded-2xl lg:block" data-reveal>
-            <Image
-              src={greenhouseRows}
-              alt={locale === 'sr'
-                ? 'Redovi paprike u savremenom plasteniku'
-                : 'Rows of peppers inside a modern greenhouse'}
-              widths={[480, 760, 1100]}
-              sizes="(min-width: 1024px) 42vw, 92vw"
-              class="aspect-[16/10] w-full scale-[1.06] object-cover"
-              data-parallax="4"
-            />
-          </figure>
-        </div>
+  {/*
+    Camera stage. With motion it is pinned and becomes the frame the camera
+    looks through (scripts/scroll-camera.ts); without it — reduced motion or no
+    JS — it is ordinary flow and the chapters read as a static zig-zag around
+    the plant.
+  */}
+  <div class="story-stage" data-camera-stage>
+    <div class="story-world" data-camera-world>
+      <div class="story-plant" data-camera-depth="0.3">
+        <PepperPlant />
       </div>
 
-      <!-- Timeline -->
-      <ol class="relative order-1 flex flex-col lg:order-2" data-reveal-group>
+      <ol class="story-chapters">
         {
-          t.story.timeline.map((entry, i) => (
-            <li
-              class:list={[
-                'relative border-l border-ink-900/12 pt-2 pl-10 md:pl-14',
-                i === t.story.timeline.length - 1 ? 'pb-2' : 'pb-14 md:pb-18',
-              ]}
-            >
-              <span
-                class="absolute top-3 -left-[5px] h-[9px] w-[9px] rounded-full bg-ember-500"
-                aria-hidden="true"
-              />
-              <p class="font-display text-[2rem] leading-none font-[560] text-ember-600 md:text-[2.5rem]">
-                {entry.year}
+          t.story.chapters.map((chapter, i) => (
+            <li class="story-chapter" data-camera-shot data-side={i % 2 === 0 ? 'left' : 'right'}>
+              <p class="kicker flex items-center gap-4 text-ink-600">
+                <span class="h-px w-8 bg-ember-500" aria-hidden="true" />
+                <span>{chapter.era}</span>
               </p>
-              <h3 class="mt-4 font-display text-display-md font-[550] text-ink-900">
-                {entry.title}
+              <h3 class="mt-5 font-display text-[clamp(1.75rem,2.6vw,2.5rem)] leading-[1.12] font-[550] text-balance text-ink-900">
+                {chapter.title}
               </h3>
-              <p class="mt-3 max-w-xl text-[1.0625rem] leading-relaxed text-ink-600">
-                {entry.text}
-              </p>
+              <div class="mt-6 space-y-4 text-base leading-[1.7] text-ink-600 md:text-[1.0625rem] md:leading-[1.75]">
+                {chapter.paragraphs.map((paragraph) => (
+                  <p>{paragraph}</p>
+                ))}
+              </div>
             </li>
           ))
         }
@@ -84,3 +51,111 @@ const t = getDictionary(locale);
     </div>
   </div>
 </section>
+
+<script>
+  import '../../scripts/scroll-camera';
+</script>
+
+<style>
+  /*
+   * Layout and motion tuning, mobile first. --block-offset is the distance
+   * from the stage centre to a chapter's centre when it is being read;
+   * --camera-pan is how far the camera swings between chapters.
+   */
+  .story {
+    --block-w: min(84vw, 30rem);
+    --block-offset: 3vw;
+    --camera-pan: 0.045;
+    --plant-w: 72vw;
+    --plant-opacity: 0.8;
+    --chapter-gap: 30svh;
+    overflow-x: clip;
+  }
+
+  @media (min-width: 768px) {
+    .story {
+      --block-w: 42vw;
+      --block-offset: calc(var(--block-w) / 2 + 5vw);
+      --camera-pan: 0.08;
+      --plant-w: 52vw;
+      --plant-opacity: 0.92;
+      --chapter-gap: 34svh;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .story {
+      --block-w: min(32vw, 34rem);
+      --block-offset: calc(var(--block-w) / 2 + 8vw);
+      --camera-pan: 0.13;
+      --plant-w: clamp(24rem, 40vw, 46rem);
+      --plant-opacity: 1;
+      --chapter-gap: 36svh;
+    }
+  }
+
+  .story-world {
+    position: relative;
+    padding-block: 34svh 20svh;
+  }
+
+  .story-plant {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .story-chapters {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--chapter-gap);
+  }
+
+  .story-chapter {
+    width: var(--block-w);
+    margin-left: calc(50% - var(--block-offset) - var(--block-w) / 2);
+    transform-origin: 50% 40%;
+  }
+
+  .story-chapter[data-side='right'] {
+    margin-left: calc(50% + var(--block-offset) - var(--block-w) / 2);
+  }
+
+  /*
+   * Below lg the text shares the centre line with the plant. A backdrop in the
+   * section colour, feathered by a same-colour shadow, lets the stem pass
+   * behind each chapter and show only in the margins and between chapters.
+   */
+  @media (max-width: 1023.98px) {
+    .story-chapter {
+      background: var(--color-cream-100);
+      box-shadow: 0 0 1.5rem 1.25rem var(--color-cream-100);
+    }
+  }
+
+  /* ── Camera mode (set by the script once it has taken over) ──────── */
+
+  .story.is-camera .story-stage {
+    position: relative;
+    height: 100svh;
+    /* clip, not hidden: nothing may scroll this box, including find-in-page. */
+    overflow: clip;
+  }
+
+  .story.is-camera .story-world {
+    position: absolute;
+    inset: 0 0 auto;
+    /* Room for the opening shot (flower) and the closing one (fruit). */
+    padding-block: 60svh 55svh;
+    will-change: transform;
+  }
+
+  .story.is-camera .story-plant {
+    will-change: transform;
+  }
+
+  .story.is-camera .story-chapter {
+    will-change: transform, opacity;
+  }
+</style>

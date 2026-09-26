@@ -1,9 +1,10 @@
 export type Locale = 'sr' | 'en';
 
-export interface TimelineEntry {
-  year: string;
+export interface StoryChapter {
+  /** Period the chapter covers, shown as its eyebrow (e.g. "1975 — 2012"). */
+  era: string;
   title: string;
-  text: string;
+  paragraphs: string[];
 }
 
 export interface Stat {
@@ -52,8 +53,7 @@ export interface Dictionary {
   story: {
     kicker: string;
     title: string;
-    lede: string;
-    timeline: TimelineEntry[];
+    chapters: StoryChapter[];
   };
   production: {
     kicker: string;

@@ -30,28 +30,36 @@ export const sr: Dictionary = {
 
   story: {
     kicker: 'O proizvodnji',
-    title: 'Pola veka posvećenosti jednoj kulturi.',
-    lede: 'Od porodičnog gazdinstva do jednog od najmodernijih proizvođača paprike u regionu — priča o tri generacije, jednoj biljci i standardu koji ne pravi kompromise.',
-    timeline: [
+    title:
+      'Istorijat i razvojni put: Od porodične tradicije do lidera u hidroponskoj proizvodnji',
+    chapters: [
       {
-        year: '1975',
-        title: 'Porodično gazdinstvo',
-        text: 'U srcu Srema porodica Đurđević počinje da obrađuje zemlju. Paprika brzo postaje kultura kojoj se posvećuje posebna pažnja — i to ostaje do danas.',
+        era: '1975 — 2012',
+        title: 'Od kašike do hidroponije',
+        paragraphs: [
+          'Naša priča počela je 1975. godine, na jednom jutru zemlje.',
+          'Dobrivoj i Tomislav Đurđević tada su sadili prvu papriku na otvorenom, koristeći kašiku. Taj detalj i danas prepričavamo u porodici. Najbolje govori o našim počecima i putu koji smo od tada prošli.',
+          'Prve plastenike podigli smo 1997. godine, takođe na jednom jutru. Uz Tomislava je tada već radio njegov sin Branislav, koji je narednih godina preuzeo sve veću odgovornost za posao. Paprika je ostala naša glavna kultura, a plastenika je iz godine u godinu bilo sve više.',
+          'Kako je rasla proizvodnja, bilo je potrebno bolje organizovati i prodaju. Sonja Đurđević zato 2012. godine osniva Agrocrop Fresh. Dok je Branislav razvijao proizvodnju, Sonja je gradila podršku za njen plasman i saradnju sa kupcima. Tako je Agrocrop Fresh postao deo istog porodičnog posla.',
+        ],
       },
       {
-        year: '1997',
-        title: 'Prelazak u zaštićen prostor',
-        text: 'Proizvodnja se seli sa otvorenog polja u prve plastenike. Kontrolisani uslovi donose ono što tržište traži: ujednačen kvalitet i sigurnost isporuke.',
+        era: '2019 — 2025',
+        title: 'Prekretnica u našem radu',
+        paragraphs: [
+          'Do 2019. godine stigli smo do 14,12 hektara plastenika u zemljištu. Iza te površine bilo je mnogo rada, ali i iskustva koje nas je naučilo da samo širenje nije dovoljno. Branislav je tada doneo odluku koja je odredila naš dalji put: izgradnju savremenih objekata na novoj lokaciji, sa većom kontrolom uslova u kojima paprika raste.',
+          'Prvih pet hektara novih plastenika počeli smo da gradimo 2019, a 2022. dodali smo još 3,8 hektara. Zatim smo 2025, tačno pedeset godina od prvog zasada, započeli hidroponsku proizvodnju na 2,5 hektara.',
+          'Od kašike kojom se sadila prva paprika do hidroponije promenilo se gotovo sve u načinu rada. Do tog trenutka doveli su nas ljudi iz naše porodice, svako svojim znanjem, odlukama i godinama provedenim u proizvodnji.',
+        ],
       },
       {
-        year: '2012',
-        title: 'Osnivanje Agrocrop Fresh',
-        text: 'Porodična proizvodnja prerasta u privredno društvo Agrocrop Fresh d.o.o. sa sedištem u Novom Sadu. Tradicija dobija profesionalnu strukturu.',
-      },
-      {
-        year: 'Danas',
-        title: '15 hektara savremene proizvodnje',
-        text: 'Moderni plastenici i staklenici, biološka zaštita bilja i GLOBALG.A.P. sertifikat. Paprika iz Pećinaca stiže do kupaca širom evropskog tržišta.',
+        era: '2026 — 2027',
+        title: 'Priča koju nastavljamo',
+        paragraphs: [
+          'U sezoni 2026. proizvodili smo na 8,8 hektara, od čega je 6,5 hektara bilo pod hidroponijom. Za 2027. planiramo ukupno 10 hektara u potpunosti hidroponske proizvodnje, sa planiranom godišnjom količinom od oko 3.000 tona paprike. U planu je i dodatni objekat od 2,5 hektara.',
+          'Danas je u svakodnevnom radu i Aleksandar, koji zajedno sa braćom Dušanom i Andrejem predstavlja četvrtu generaciju porodice Đurđević. U posao je uključen tamo gde je potreban — u proizvodnji i svim drugim obavezama koje dan donese. Uz oca i majku upoznaje posao iznutra, kao što su ga i oni učili uz svoju porodicu.',
+          'Agrocrop Fresh je deo te priče. Iza njegovog imena stoje porodica Đurđević, naša paprika i posao koji gradimo od 1975. godine.',
+        ],
       },
     ],
   },

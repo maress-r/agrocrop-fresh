@@ -30,28 +30,36 @@ export const en: Dictionary = {
 
   story: {
     kicker: 'Our story',
-    title: 'Half a century devoted to a single crop.',
-    lede: 'From a family farm to one of the most modern pepper producers in the region — a story of three generations, one plant, and a standard that accepts no compromise.',
-    timeline: [
+    title:
+      'History and development: from a family tradition to a leader in hydroponic production',
+    chapters: [
       {
-        year: '1975',
-        title: 'The family farm',
-        text: 'In the heart of Srem, the Đurđević family begins working the land. Peppers quickly become the crop that receives special attention — and it has stayed that way ever since.',
+        era: '1975 — 2012',
+        title: 'From a spoon to hydroponics',
+        paragraphs: [
+          'Our story began in 1975, on a single jutro of land — a little over half a hectare.',
+          'That year Dobrivoj and Tomislav Đurđević planted their first peppers in the open field, using a spoon. It is a detail the family still retells today, and nothing says more about where we started and how far we have come since.',
+          'We built our first greenhouses in 1997, also on a single jutro. By then Tomislav was working alongside his son Branislav, who over the following years took on more and more responsibility for the business. Peppers remained our main crop, and year after year there were more greenhouses.',
+          'As production grew, sales needed better organisation too. So in 2012 Sonja Đurđević founded Agrocrop Fresh. While Branislav developed production, Sonja built the support for bringing it to market and for working with customers. That is how Agrocrop Fresh became part of the same family business.',
+        ],
       },
       {
-        year: '1997',
-        title: 'Moving under cover',
-        text: 'Production moves from open fields into the first greenhouses. Controlled conditions deliver what the market demands: uniform quality and reliable supply.',
+        era: '2019 — 2025',
+        title: 'A turning point in our work',
+        paragraphs: [
+          'By 2019 we had reached 14.12 hectares of soil-based greenhouses. Behind that area lay a great deal of work — and experience that taught us expansion alone is not enough. Branislav then made the decision that set our course: building modern facilities at a new location, with greater control over the conditions in which our peppers grow.',
+          'We began building the first five hectares of new greenhouses in 2019 and added another 3.8 hectares in 2022. Then in 2025 — exactly fifty years after the first planting — we started hydroponic production on 2.5 hectares.',
+          'From the spoon that planted the first pepper to hydroponics, almost everything about the way we work has changed. What brought us here were the people of our family, each with their own knowledge, decisions and years spent in production.',
+        ],
       },
       {
-        year: '2012',
-        title: 'Agrocrop Fresh is founded',
-        text: 'The family operation becomes Agrocrop Fresh LLC, headquartered in Novi Sad. Tradition gains a professional structure.',
-      },
-      {
-        year: 'Today',
-        title: '15 hectares of modern production',
-        text: 'Modern greenhouses, biological crop protection and GLOBALG.A.P. certification. Peppers from Pećinci reach buyers across the European market.',
+        era: '2026 — 2027',
+        title: 'A story we carry on',
+        paragraphs: [
+          'In the 2026 season we grew on 8.8 hectares, 6.5 of them hydroponic. For 2027 we are planning a total of 10 hectares of fully hydroponic production, with a planned annual volume of around 3,000 tonnes of peppers. An additional 2.5-hectare facility is also planned.',
+          'Today Aleksandar is part of the daily work too — together with his brothers Dušan and Andrej, he represents the fourth generation of the Đurđević family. He steps in wherever he is needed: in production and in every other task the day brings. Working alongside his father and mother, he is learning the business from the inside, just as they learned it with their own family.',
+          'Agrocrop Fresh is part of that story. Behind its name stand the Đurđević family, our peppers, and the business we have been building since 1975.',
+        ],
       },
     ],
   },
