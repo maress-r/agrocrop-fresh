@@ -84,6 +84,11 @@ export interface Dictionary {
   gallery: {
     kicker: string;
     title: string;
+    /** "+" tile caption. */
+    more: string;
+    /** Photo count, {count} is replaced. */
+    moreCount: string;
+    moreTitle: string;
   };
   contact: {
     kicker: string;

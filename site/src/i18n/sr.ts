@@ -150,6 +150,9 @@ export const sr: Dictionary = {
   gallery: {
     kicker: 'Galerija',
     title: 'Proizvodnja koju vredi videti.',
+    more: 'Pogledajte još',
+    moreCount: '{count} fotografija',
+    moreTitle: 'Još iz naše proizvodnje',
   },
 
   contact: {

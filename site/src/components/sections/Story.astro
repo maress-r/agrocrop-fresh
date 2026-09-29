@@ -11,12 +11,17 @@ const { locale } = Astro.props;
 const t = getDictionary(locale);
 ---
 
-<section id="story" class="story bg-cream-100 pt-(--spacing-section)" data-scroll-camera>
+<section id="story" class="story bg-cream-100 pt-(--spacing-section)"
+  data-scroll-camera="(min-width: 768px)"
+>
   <div class="container-site">
     <SectionHead number="01" kicker={t.story.kicker} title={t.story.title} titleClass="max-w-4xl" />
   </div>
 
   {/*
+    The camera only runs from md (768px) up, where chapters sit left / right
+    of the plant; below that they stack, so plain vertical scroll reads better.
+
     Camera stage. With motion it is pinned and becomes the frame the camera
     looks through (scripts/scroll-camera.ts); without it — reduced motion or no
     JS — it is ordinary flow and the chapters read as a static zig-zag around

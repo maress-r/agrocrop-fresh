@@ -19,6 +19,10 @@
  *  Tuning, as a CSS custom property on [data-scroll-camera]:
  *    --camera-pan   horizontal swing, as a fraction of the stage width
  *
+ *  The attribute's value may be a media query (e.g. "(min-width: 768px)"):
+ *  the camera only runs while it matches, and hands back to the static layout
+ *  otherwise — use it where the layout stops placing shots side by side.
+ *
  *  The script only takes over when motion is allowed, and marks that by
  *  adding `is-camera` to the root. Without the class the markup is an
  *  ordinary static layout, so reduced motion or a failed load still reads.
@@ -230,7 +234,13 @@ function setup(root: HTMLElement): void {
 
   const mm = gsap.matchMedia();
 
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
+  const layout = root.dataset.scrollCamera?.trim();
+  const when = ['(prefers-reduced-motion: no-preference)', layout].filter(Boolean).join(' and ');
+
+  mm.add(when, () => {
+    // Taking over mid-page (e.g. widening past the breakpoint) must not lose
+    // the reader's place: measuring the new pin resets scroll to the top.
+    const resumeAt = window.scrollY;
     root.classList.add('is-camera');
 
     let plan = buildPlan();
@@ -299,6 +309,11 @@ function setup(root: HTMLElement): void {
       onUpdate: (self) => render(self.progress * plan.total),
       onRefresh: (self) => render(self.progress * plan.total),
     });
+
+    if (resumeAt > 0) {
+      ScrollTrigger.refresh();
+      window.scrollTo(0, resumeAt);
+    }
 
     return () => {
       root.classList.remove('is-camera');

@@ -150,6 +150,9 @@ export const en: Dictionary = {
   gallery: {
     kicker: 'Gallery',
     title: 'Production worth seeing.',
+    more: 'See more',
+    moreCount: '{count} photos',
+    moreTitle: 'More from our production',
   },
 
   contact: {
