@@ -177,8 +177,10 @@ html.has-motion [data-hero-line] {
 }
 
 /* Line drawings inside [data-inview] draw themselves once seen: strokes
-   carry pathLength="1"; .draw-accent shapes follow. --draw-delay staggers. */
-[data-inview] [pathLength] {
+   with class "draw" carry pathLength="1"; .draw-accent shapes follow.
+   --draw-delay staggers. (A class, not [pathLength]: Chromium does not
+   restyle camel-cased SVG attribute matches when the ancestor changes.) */
+[data-inview] .draw {
   stroke-dasharray: 1;
   transition: stroke-dashoffset 1.6s var(--ease-out-quart) var(--draw-delay, 0s);
 }
@@ -187,7 +189,7 @@ html.has-motion [data-hero-line] {
   transition: opacity 0.6s ease-out calc(var(--draw-delay, 0s) + 0.9s);
 }
 
-html.has-motion [data-inview]:not(.is-inview) [pathLength] {
+html.has-motion [data-inview]:not(.is-inview) .draw {
   stroke-dashoffset: 1;
 }
 

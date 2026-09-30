@@ -1,0 +1,704 @@
+---
+/**
+ * The production process as one schematic greenhouse: a hydroponic row
+ * (coconut substrate, drippers), nutrient dosing into the tank, a hot-air
+ * heater, a climate sensor — and Priva, wired to all of them.
+ *
+ * `step` brings forward what a production step talks about and dims the
+ * rest; `view` crops the drawing to that part. Smaller screens show one crop
+ * per step; lg+ shows one full view whose step the Production section
+ * script switches as the reader scrolls (`live`).
+ *
+ * Lines keep one weight at every size (non-scaling strokes). The flows —
+ * solution in the pipes, drops, warm air, Priva's signals — only move while
+ * the scene is in view (`.is-playing`, set by the section script) and never
+ * under reduced motion.
+ */
+import type { SceneLabel } from '../i18n/types';
+
+type Step = 'all' | 'hydro' | 'climate' | 'heat' | 'feed';
+type Part =
+  | 'plants'
+  | 'roots'
+  | 'drip'
+  | 'tank'
+  | 'dosing'
+  | 'water'
+  | 'heater'
+  | 'air'
+  | 'sensor'
+  | 'priva'
+  | 'toHeater'
+  | 'toSensor'
+  | 'toDosing';
+
+interface Props {
+  step?: Step;
+  /** Which part of the drawing to frame. */
+  view?: keyof typeof VIEWS;
+  labels: Record<SceneLabel, string>;
+  /** The step changes at runtime: render every callout, CSS shows the step's. */
+  live?: boolean;
+  class?: string;
+}
+
+const { step = 'all', view = 'full', labels, live = false, class: className } = Astro.props;
+
+/* ── Geometry (scene units, 960 × 720) ──────────────────────────────── */
+
+type Pt = readonly [number, number];
+const r1 = (n: number) => Math.round(n * 10) / 10;
+const xy = (p: Pt) => `${r1(p[0])} ${r1(p[1])}`;
+
+/** Ovate leaf from its base, pointing `deg` (0 = right, 90 = down). */
+function leaf(base: Pt, deg: number, len: number, w: number) {
+  const a = (deg * Math.PI) / 180;
+  const d: Pt = [Math.cos(a), Math.sin(a)];
+  const n: Pt = [-d[1], d[0]];
+  const at = (s: number, o: number): Pt => [base[0] + d[0] * s * len + n[0] * o, base[1] + d[1] * s * len + n[1] * o];
+  const tip = at(1, 0);
+  return {
+    blade: `M${xy(base)}C${xy(at(0.16, w))} ${xy(at(0.62, w * 0.92))} ${xy(tip)}C${xy(at(0.62, -w * 0.92))} ${xy(at(0.16, -w))} ${xy(base)}Z`,
+    rib: `M${xy(at(0.08, 0))}L${xy(at(0.8, 0))}`,
+  };
+}
+
+/** Blocky bell pepper hanging from (x, y). */
+function pepper([x, y]: Pt, s = 1) {
+  const p = (dx: number, dy: number) => xy([x + dx * s, y + dy * s]);
+  return {
+    stalk: `M${p(0, 0)}C${p(1, 3)} ${p(1.5, 6)} ${p(0.5, 9)}`,
+    body:
+      `M${p(-8, 10)}C${p(-13, 13)} ${p(-13.5, 31)} ${p(-9.5, 38)}C${p(-7, 42)} ${p(-3, 40.5)} ${p(0, 38.5)}` +
+      `C${p(3, 41)} ${p(7.5, 42)} ${p(9.5, 38)}C${p(13.5, 31)} ${p(13, 13)} ${p(8, 10)}C${p(4, 8)} ${p(-4, 8)} ${p(-8, 10)}Z`,
+    groove: `M${p(-1, 16)}C${p(-2, 24)} ${p(-1.5, 31)} ${p(0, 37)}`,
+  };
+}
+
+/**
+ * Nodes up a trained stem: a leaf on alternating sides (angle, length,
+ * width), at some a smaller one opposite.
+ */
+const NODES: { y: number; x: number; leaf: [number, number, number]; pair?: number }[] = [
+  { y: -20, x: 0, leaf: [-12, 34, 12] },
+  { y: -44, x: -2, leaf: [196, 40, 14], pair: 0.72 },
+  { y: -70, x: 2, leaf: [-20, 44, 15] },
+  { y: -96, x: -2, leaf: [200, 44, 15], pair: 0.7 },
+  { y: -122, x: 1, leaf: [-28, 40, 14] },
+  { y: -146, x: -1, leaf: [208, 36, 12.5], pair: 0.66 },
+  { y: -166, x: 1, leaf: [-46, 28, 10] },
+];
+
+/** Fruit per plant: [node index, side, size] — two each, never touching. */
+const FRUIT: [number, number, number][][] = [
+  [[1, 1, 1.12], [3, -1, 1.05]],
+  [[2, -1, 1.14], [4, 1, 0.98]],
+];
+
+/** Deterministic jitter in [-1, 1] so the four plants differ a little. */
+const jitter = (i: number, k: number) => {
+  const s = Math.sin((i + 1) * 12.9898 + k * 78.233) * 43758.5453;
+  return (s - Math.floor(s)) * 2 - 1;
+};
+
+/** One pepper plant standing on its cube at (px, 542); odd ones are mirrored. */
+function plant(px: number, i: number) {
+  const m = i % 2 === 1 ? -1 : 1;
+  const P = (dx: number, dy: number): Pt => [px + dx * m, 542 + dy];
+  const deg = (a: number) => (m === -1 ? 180 - a : a);
+
+  // Stem through the nodes, as one smooth run.
+  const pts = [P(0, 0), ...NODES.map((n) => P(n.x, n.y)), P(0, -184)];
+  let stem = `M${xy(pts[0]!)}`;
+  for (let k = 0; k < pts.length - 1; k++) {
+    const [a, b] = [pts[k]!, pts[k + 1]!];
+    const my = (a[1] + b[1]) / 2;
+    stem += `C${xy([a[0], my])} ${xy([b[0], my])} ${xy(b)}`;
+  }
+
+  const leaves = NODES.flatMap((n, k) => {
+    const side = k % 2 === 0 ? 1 : -1;
+    const at = P(n.x, n.y);
+    const base = P(n.x + side * 9, n.y - 3);
+    const [a, len, w] = n.leaf;
+    const angle = a + jitter(i, k) * 9;
+    const size = 1 + jitter(i, k + 7) * 0.08;
+    const out = [{ petiole: `M${xy(at)}L${xy(base)}`, ...leaf(base, deg(angle), len * size, w * size) }];
+    if (n.pair) {
+      const opp = P(n.x - side * 7, n.y - 2);
+      out.push({
+        petiole: `M${xy(at)}L${xy(opp)}`,
+        ...leaf(opp, deg(180 - angle + 8), len * n.pair, w * n.pair),
+      });
+    }
+    return out;
+  });
+  // Young leaves at the apex.
+  leaves.push(
+    { petiole: '', ...leaf(P(0, -184), deg(-118), 20, 7) },
+    { petiole: '', ...leaf(P(0, -184), deg(-64), 22, 7.5) }
+  );
+
+  const fruit = FRUIT[i % 2]!.map(([k, side, s]) => {
+    const n = NODES[k]!;
+    const hang = P(n.x + side * 12, n.y + 4);
+    const f = pepper(hang, s);
+    return { ...f, stalk: `M${xy(P(n.x, n.y))}Q${xy(P(n.x + side * 9, n.y - 2))} ${xy(hang)}` + f.stalk.replace(/^M[^C]+/, '') };
+  });
+  return { stem, leaves, fruit };
+}
+
+const PLANTS = [200, 330, 520, 650] as const;
+const plants = PLANTS.map((px, i) => plant(px, i));
+
+/** Wavy line of warm air from x0 to x1 around y. */
+function wave(y: number, x0: number, x1: number, phase: number) {
+  const pts: Pt[] = [];
+  for (let x = x0; x <= x1; x += 8) pts.push([x, y + Math.sin((x + phase) / 11) * 4]);
+  return `M${pts.map(xy).join('L')}`;
+}
+
+/* ── Parts, by the steps that bring them forward ───────────────────── */
+
+/**
+ * `on`: steps in which the part is in focus; `off`: steps in which it
+ * recedes. Anything else sits at the neutral tone.
+ */
+const STEPS: Record<Part, { on: Step[]; off: Step[] }> = {
+  plants: { on: ['hydro', 'feed'], off: [] },
+  roots: { on: ['hydro', 'feed'], off: ['climate', 'heat'] },
+  drip: { on: ['hydro', 'feed'], off: ['heat'] },
+  tank: { on: ['hydro', 'feed', 'climate'], off: ['heat'] },
+  dosing: { on: ['feed', 'climate'], off: ['heat'] },
+  water: { on: ['feed'], off: ['heat', 'hydro'] },
+  heater: { on: ['heat', 'climate'], off: ['hydro', 'feed'] },
+  air: { on: ['heat'], off: ['hydro', 'feed', 'climate'] },
+  sensor: { on: ['climate', 'heat'], off: ['hydro', 'feed'] },
+  priva: { on: ['climate', 'heat', 'feed'], off: [] },
+  toHeater: { on: ['climate', 'heat'], off: ['hydro', 'feed'] },
+  toSensor: { on: ['climate', 'heat'], off: ['hydro', 'feed'] },
+  toDosing: { on: ['climate', 'feed'], off: ['hydro', 'heat'] },
+};
+
+const part = (name: Part) => ({
+  'data-part': name,
+  'data-on': STEPS[name].on.join(' '),
+  'data-off': STEPS[name].off.join(' '),
+});
+
+/* ── Callouts ───────────────────────────────────────────────────────── */
+
+/** Crops of the drawing: [x, y, width, height]. */
+const VIEWS = {
+  full: [0, 0, 960, 720],
+  hydro: [290, 310, 630, 390],
+  climate: [0, 0, 960, 720],
+  heat: [30, 210, 630, 380],
+  feed: [440, 440, 520, 270],
+} as const;
+type View = keyof typeof VIEWS;
+
+type Place = 'top' | 'bottom' | 'left' | 'right' | 'center';
+/** Where each callout points, per step; `views` limits one to certain crops. */
+const CALLOUTS: { id: SceneLabel; at: Pt; place: Place; steps: Step[]; views?: View[] }[] = [
+  { id: 'priva', at: [480, 58], place: 'center', steps: ['all', 'hydro', 'climate', 'heat', 'feed'] },
+  { id: 'climate', at: [616, 326], place: 'right', steps: ['climate'] },
+  { id: 'heating', at: [152, 348], place: 'bottom', steps: ['climate'] },
+  { id: 'feeding', at: [786, 531], place: 'left', steps: ['climate'] },
+  { id: 'substrate', at: [265, 600], place: 'bottom', steps: ['hydro'], views: ['full'] },
+  { id: 'substrate', at: [476, 604], place: 'bottom', steps: ['hydro'], views: ['hydro'] },
+  { id: 'dripper', at: [352, 526], place: 'right', steps: ['hydro'] },
+  { id: 'solution', at: [776, 598], place: 'left', steps: ['hydro'] },
+  { id: 'heater', at: [152, 298], place: 'top', steps: ['heat'] },
+  { id: 'warmAir', at: [420, 306], place: 'top', steps: ['heat'] },
+  { id: 'sensor', at: [584, 326], place: 'left', steps: ['heat'] },
+  { id: 'water', at: [872, 604], place: 'top', steps: ['feed'] },
+  { id: 'nutrients', at: [786, 531], place: 'left', steps: ['feed'] },
+  { id: 'toPlants', at: [585, 600], place: 'bottom', steps: ['feed'] },
+];
+
+const [vx, vy, vw, vh] = VIEWS[view];
+const inView = ([x, y]: Pt) => x >= vx && x <= vx + vw && y >= vy && y <= vy + vh;
+const callouts = CALLOUTS.filter(
+  (c) =>
+    inView(c.at) &&
+    (!c.views || c.views.includes(view)) &&
+    (live || c.steps.includes(step) || c.id === 'priva')
+).map((c) => ({
+  ...c,
+  left: (((c.at[0] - vx) / vw) * 100).toFixed(2),
+  top: (((c.at[1] - vy) / vh) * 100).toFixed(2),
+}));
+---
+
+<div
+  class:list={['scene', className]}
+  data-scene
+  data-step={step}
+  style={`--ratio: ${vw} / ${vh}`}
+>
+  <svg viewBox={`${vx} ${vy} ${vw} ${vh}`} aria-hidden="true" focusable="false">
+    <!-- Greenhouse: two arched spans -->
+    <g class="scene-frame">
+      <path d="M24 668H936" />
+      <path d="M64 252V668M480 252V668M896 252V668" />
+      <path d="M64 252C64 212 170 166 272 162C374 166 480 212 480 252M480 252C480 212 586 166 688 162C790 166 896 212 896 252" />
+      <path class="fine" d="M64 252H896M64 290H896" />
+    </g>
+
+    <!-- Priva's wiring (behind everything it reaches) -->
+    <g {...part('toHeater')} class="scene-signal">
+      <path d="M408 58H152Q140 58 140 70V298" />
+      <path class="scene-pulse" d="M408 58H152Q140 58 140 70V298" />
+    </g>
+    <g {...part('toSensor')} class="scene-signal">
+      <path d="M600 170V142Q600 130 588 130H492Q480 130 480 118V86" />
+      <path class="scene-pulse" d="M600 170V142Q600 130 588 130H492Q480 130 480 118V86" />
+    </g>
+    <g {...part('toDosing')} class="scene-signal">
+      <path d="M552 58H796Q808 58 808 70V516" />
+      <path class="scene-pulse" d="M552 58H796Q808 58 808 70V516" />
+    </g>
+
+    <!-- Warm air, from the heater along the crop -->
+    <g {...part('air')} class="scene-air">
+      <path d={wave(306, 196, 880, 0)} />
+      <path d={wave(320, 196, 860, 30)} />
+      <path d={wave(334, 196, 840, 60)} />
+    </g>
+
+    <!-- The row: plants on cubes, substrate slabs in a gutter -->
+    <g {...part('plants')}>
+      <path class="fine" d={PLANTS.map((px) => `M${px + 4} 290V540`).join('')} />
+      <path d="M104 600V614H748V600M150 614V668M426 614V668M700 614V668" />
+      <rect class="solid" x="124" y="566" width="282" height="34" rx="7" />
+      <rect class="solid" x="444" y="566" width="282" height="34" rx="7" />
+      {
+        plants.map(({ stem, leaves, fruit }) => (
+          <g>
+            <path d={stem} />
+            <path d={leaves.map((l) => l.petiole).join('')} />
+            {leaves.map((l) => (
+              <>
+                <path class="solid" d={l.blade} />
+                <path class="fine" d={l.rib} />
+              </>
+            ))}
+            {fruit.map((f) => (
+              <>
+                <path d={f.stalk} />
+                <path class="scene-fruit" d={f.body} />
+                <path class="fine" d={f.groove} />
+              </>
+            ))}
+          </g>
+        ))
+      }
+    </g>
+
+    <g {...part('roots')} class="fine">
+      <path
+        d={PLANTS.map(
+          (px) =>
+            `M${px - 5} 566C${px - 10} 575 ${px - 22} 582 ${px - 40} 591` +
+            `M${px} 566C${px + 1} 576 ${px - 3} 586 ${px + 2} 596` +
+            `M${px + 5} 566C${px + 12} 574 ${px + 26} 580 ${px + 44} 587` +
+            `M${px - 21} 581l-7 7M${px + 23} 578l8 5M${px - 1} 584l-6 6`
+        ).join('')}
+      />
+    </g>
+
+    <!-- Irrigation: tank → riser → drip line → a dripper per plant -->
+    <g {...part('drip')}>
+      {PLANTS.map((px) => <rect class="solid" x={px - 15} y="542" width="30" height="24" rx="3" />)}
+      <path d="M776 646H760V583H104" />
+      <path
+        d={PLANTS.map((px) => `M${px + 24} 580C${px + 31} 560 ${px + 29} 530 ${px + 15} 522`).join('')}
+        class="fine"
+      />
+      <path d={PLANTS.map((px) => `M${px + 15} 522L${px + 9} 532`).join('')} class="scene-stake" />
+      {PLANTS.map((px) => <circle class="solid" cx={px + 24} cy="583" r="3.5" />)}
+      <path class="scene-flow" d="M776 646H760V583H104" />
+      {PLANTS.map((px, i) => <circle class="scene-drop" cx={px + 8} cy="538" r="2.6" style={`--i: ${i}`} />)}
+    </g>
+
+    <!-- Nutrient solution tank, dosing unit above it, water inlet -->
+    <g {...part('tank')}>
+      <rect class="solid" x="776" y="560" width="64" height="108" rx="8" />
+      <path
+        class="scene-liquid"
+        d="M779 596C790 592 800 599 811 595C822 591 830 598 837 595V660C837 663 835 665 832 665H784C781 665 779 663 779 660Z"
+      />
+      <path class="fine" d="M779 596C790 592 800 599 811 595C822 591 830 598 837 595" />
+    </g>
+    <g {...part('dosing')}>
+      <path d="M808 546V560" />
+      <rect class="solid" x="786" y="516" width="44" height="30" rx="6" />
+      <circle class="scene-dot" cx="798" cy="531" r="2.4" />
+      <circle class="scene-dot" cx="808" cy="531" r="2.4" />
+      <circle class="scene-dot" cx="818" cy="531" r="2.4" />
+      <circle class="scene-feed" cx="808" cy="552" r="2.2" />
+      <circle class="scene-feed" cx="808" cy="552" r="2.2" style="--i: 1" />
+    </g>
+    <g {...part('water')}>
+      <path d="M936 612H840" />
+      <path class="fine" d="M864 604L880 620V604L864 620Z" />
+      <path class="scene-flow" d="M936 612H840" />
+    </g>
+
+    <!-- Hot-air heater on the gable post -->
+    <g {...part('heater')}>
+      <path d="M64 322H98" />
+      <rect class="solid" x="98" y="298" width="84" height="50" rx="8" />
+      <path class="fine" d="M182 306H190V340H182" />
+      <path
+        class="scene-flame"
+        d="M140 309C144 314 149 318 149 325C149 331 145 336 140 336C135 336 131 332 131 326C131 321 134 318 137 314C137 318 139 320 141 321C142 317 141 313 140 309Z"
+      />
+    </g>
+
+    <!-- Climate sensor, hanging among the crop -->
+    <g {...part('sensor')}>
+      <path d="M600 170V312" />
+      <rect class="solid" x="584" y="312" width="32" height="28" rx="5" />
+      <path class="fine" d="M590 320H610M590 326H610M590 332H610" />
+      <circle class="scene-ping" cx="600" cy="326" r="22" />
+    </g>
+
+    <!-- Priva -->
+    <g {...part('priva')}>
+      <rect class="solid" x="408" y="30" width="144" height="56" rx="28" />
+      <circle class="scene-status" cx="430" cy="58" r="4" />
+      <circle class="scene-ping" cx="430" cy="58" r="12" />
+    </g>
+  </svg>
+
+  {
+    callouts.map((c) => (
+      <span
+        class="scene-label"
+        data-place={c.place}
+        data-steps={c.steps.join(' ')}
+        style={`left: ${c.left}%; top: ${c.top}%`}
+      >
+        {labels[c.id]}
+      </span>
+    ))
+  }
+</div>
+
+<style>
+  .scene {
+    --scene-bg: var(--color-forest-900);
+    --line: color-mix(in srgb, var(--color-sage-300) 78%, transparent);
+    --line-on: var(--color-cream-50);
+    --line-frame: color-mix(in srgb, var(--color-sage-300) 32%, transparent);
+    --off: 0.2;
+    position: relative;
+    aspect-ratio: var(--ratio);
+    container-type: inline-size;
+  }
+
+  .scene svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.5px;
+  }
+
+  .scene svg :global(*) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .scene :global(.fine) {
+    stroke-width: 1px;
+  }
+
+  .scene :global(.solid) {
+    fill: var(--scene-bg);
+  }
+
+  /* ── Tones: neutral, in focus, receding ─────────────────────────── */
+
+  .scene-frame {
+    color: var(--line-frame);
+  }
+
+  [data-part] {
+    color: var(--line);
+    transition:
+      color 0.6s var(--ease-out-quart),
+      opacity 0.6s var(--ease-out-quart);
+  }
+
+  .scene[data-step='hydro'] [data-on~='hydro'],
+  .scene[data-step='climate'] [data-on~='climate'],
+  .scene[data-step='heat'] [data-on~='heat'],
+  .scene[data-step='feed'] [data-on~='feed'] {
+    color: var(--line-on);
+  }
+
+  .scene[data-step='hydro'] [data-off~='hydro'],
+  .scene[data-step='climate'] [data-off~='climate'],
+  .scene[data-step='heat'] [data-off~='heat'],
+  .scene[data-step='feed'] [data-off~='feed'] {
+    opacity: var(--off);
+  }
+
+  .scene-fruit {
+    fill: color-mix(in srgb, currentColor 20%, var(--scene-bg));
+  }
+
+  .scene-liquid {
+    fill: color-mix(in srgb, currentColor 14%, transparent);
+    stroke: none;
+  }
+
+  .scene-dot {
+    fill: currentColor;
+    stroke: none;
+  }
+
+  .scene-stake {
+    stroke-width: 2.5px;
+  }
+
+  /* Accents: heat and Priva's signals */
+  .scene-flame,
+  .scene-status {
+    fill: color-mix(in srgb, var(--color-ember-400) 30%, transparent);
+    stroke: var(--color-ember-400);
+  }
+
+  .scene-signal {
+    stroke-dasharray: 2 6;
+  }
+
+  .scene-signal .scene-pulse {
+    stroke: var(--color-ember-400);
+    stroke-dasharray: 10 90;
+    opacity: 0;
+  }
+
+  /* Warm air only shows where heating is the subject. */
+  .scene-air {
+    --off: 0;
+    color: var(--color-ember-400);
+    opacity: 0.45;
+  }
+
+  .scene[data-step='heat'] .scene-air {
+    opacity: 0.85;
+  }
+
+  .scene-air path {
+    stroke-dasharray: 64 22;
+  }
+
+  /* Things that only exist while they move */
+  .scene-flow {
+    stroke: var(--line-on);
+    stroke-width: 3px;
+    stroke-dasharray: 0.1 14;
+    opacity: 0;
+  }
+
+  .scene-drop,
+  .scene-feed {
+    fill: var(--line-on);
+    stroke: none;
+    opacity: 0;
+  }
+
+  .scene-ping {
+    stroke: var(--color-ember-400);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* ── Callouts ───────────────────────────────────────────────────── */
+
+  .scene-label {
+    position: absolute;
+    z-index: 1;
+    display: block;
+    padding: 0.3125rem 0.625rem;
+    border: 1px solid color-mix(in srgb, var(--color-sage-300) 28%, transparent);
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--color-forest-950) 88%, transparent);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--color-cream-50);
+    pointer-events: none;
+    transition:
+      opacity 0.45s var(--ease-out-quart),
+      translate 0.45s var(--ease-out-quart);
+  }
+
+  .scene-label[data-place='top'] {
+    transform: translate(-50%, calc(-100% - 0.625rem));
+  }
+
+  .scene-label[data-place='bottom'] {
+    transform: translate(-50%, 0.625rem);
+  }
+
+  .scene-label[data-place='left'] {
+    transform: translate(calc(-100% - 0.75rem), -50%);
+  }
+
+  .scene-label[data-place='right'] {
+    transform: translate(0.75rem, -50%);
+  }
+
+  .scene-label[data-place='center'] {
+    transform: translate(-50%, -50%);
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  /* Phone-sized crops: smaller callouts keep the drawing visible. */
+  @container (max-width: 26rem) {
+    .scene-label {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.1em;
+    }
+
+    .scene-label[data-place='center'] {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Only the step's own callouts (Priva's name always shows). */
+  .scene-label:not([data-place='center']) {
+    opacity: 0;
+    translate: 0 0.25rem;
+  }
+
+  .scene[data-step='hydro'] .scene-label[data-steps~='hydro'],
+  .scene[data-step='climate'] .scene-label[data-steps~='climate'],
+  .scene[data-step='heat'] .scene-label[data-steps~='heat'],
+  .scene[data-step='feed'] .scene-label[data-steps~='feed'] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* ── Motion (in view, motion allowed) ───────────────────────────── */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .scene:global(.is-playing)[data-step='hydro'] [data-part='drip'] .scene-flow,
+    .scene:global(.is-playing)[data-step='feed'] :is([data-part='drip'], [data-part='water']) .scene-flow {
+      opacity: 0.9;
+      animation: scene-flow 0.9s linear infinite;
+    }
+
+    .scene:global(.is-playing)[data-step='hydro'] .scene-drop,
+    .scene:global(.is-playing)[data-step='feed'] .scene-drop {
+      animation: scene-drop 1.8s var(--ease-in-out-quart) infinite;
+      animation-delay: calc(var(--i, 0) * -0.45s);
+    }
+
+    .scene:global(.is-playing)[data-step='feed'] .scene-feed {
+      animation: scene-drop 1.6s var(--ease-in-out-quart) infinite;
+      animation-delay: calc(var(--i, 0) * -0.8s);
+    }
+
+    .scene:global(.is-playing)[data-step='heat'] .scene-air path {
+      animation: scene-air 1.6s linear infinite;
+    }
+
+    .scene:global(.is-playing)[data-step='heat'] .scene-flame {
+      transform-box: fill-box;
+      transform-origin: 50% 100%;
+      animation: scene-flame 1.4s ease-in-out infinite alternate;
+    }
+
+    .scene:global(.is-playing)[data-step='climate'] .scene-pulse,
+    .scene:global(.is-playing)[data-step='heat'] :is([data-part='toHeater'], [data-part='toSensor']) .scene-pulse,
+    .scene:global(.is-playing)[data-step='feed'] [data-part='toDosing'] .scene-pulse {
+      opacity: 1;
+      animation: scene-pulse 2.4s linear infinite;
+    }
+
+    .scene:global(.is-playing)[data-step='climate'] .scene-ping,
+    .scene:global(.is-playing)[data-step='heat'] [data-part='sensor'] .scene-ping {
+      animation: scene-ping 2.4s var(--ease-out-quart) infinite;
+    }
+  }
+
+  @keyframes scene-flow {
+    to {
+      stroke-dashoffset: -14;
+    }
+  }
+
+  @keyframes scene-air {
+    to {
+      stroke-dashoffset: -86;
+    }
+  }
+
+  @keyframes scene-pulse {
+    from {
+      stroke-dashoffset: 100;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes scene-drop {
+    0% {
+      opacity: 0;
+      transform: translateY(-3px);
+    }
+    25%,
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(9px);
+    }
+  }
+
+  @keyframes scene-flame {
+    from {
+      opacity: 0.75;
+      transform: scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes scene-ping {
+    0% {
+      opacity: 0.7;
+      transform: scale(0.4);
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+</style>

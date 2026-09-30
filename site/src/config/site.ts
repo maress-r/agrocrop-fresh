@@ -60,8 +60,8 @@ export const site = {
   ],
 
   stats: {
-    hectares: 15,
-    annualTonnes: 2500,
+    hectares: 10,
+    annualTonnes: 3000,
     coldStorageTonnes: 400,
     packingCenterM2: 2500,
   },

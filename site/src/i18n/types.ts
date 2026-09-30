@@ -26,6 +26,31 @@ export interface Pillar {
   text: string;
 }
 
+/** One step of the production process (section 02), in reading order. */
+export interface ProductionStep {
+  id: 'hydro' | 'climate' | 'heat' | 'feed' | 'people';
+  /** Short name — the step's kicker and its entry in the step navigation. */
+  label: string;
+  title: string;
+  paragraphs: string[];
+}
+
+/** Callouts in the production illustration (components/ProductionScene.astro). */
+export type SceneLabel =
+  | 'priva'
+  | 'climate'
+  | 'heating'
+  | 'feeding'
+  | 'substrate'
+  | 'dripper'
+  | 'solution'
+  | 'heater'
+  | 'warmAir'
+  | 'sensor'
+  | 'water'
+  | 'nutrients'
+  | 'toPlants';
+
 /** A beneficial-organism system from Biobest (facts from the product pages). */
 export interface BeneficialItem {
   id: 'propylea' | 'orius' | 'swirskii' | 'micromus';
@@ -75,13 +100,28 @@ export interface Dictionary {
     title: string;
     chapters: StoryChapter[];
   };
+  /** Section 02, told as one process: hydroponics → Priva → heating → nutrition → people. */
   production: {
     kicker: string;
     title: string;
     lede: string;
+    /** Accessible name of the step navigation. */
+    stepsLabel: string;
+    steps: ProductionStep[];
+    scene: Record<SceneLabel, string>;
+    /** Heating chart: outside vs. greenhouse temperature over a day and a night. */
+    chart: {
+      inside: string;
+      outside: string;
+      setpoint: string;
+      heaters: string;
+      day: string;
+      night: string;
+    };
+    /** Link from the last step to the Quality section. */
+    qualityLink: string;
+    statsTitle: string;
     stats: Stat[];
-    bioTitle: string;
-    bioText: string;
   };
   products: {
     kicker: string;

@@ -10,6 +10,7 @@
  *    data-split                   masked line-by-line heading reveal
  *    data-parallax="10"           scrubbed vertical drift (yPercent)
  *    data-counter="2500"          count-up number, locale-formatted
+ *    data-counter-delay="0.1"     optional delay for data-counter
  *    data-viewport-play           <video> plays only while in viewport
  *    data-inview                  gets `is-inview` once seen; CSS animates
  *                                 (e.g. line drawings, global.css)
@@ -162,18 +163,31 @@ function init(): void {
   const numberLocale = document.documentElement.lang.startsWith('sr') ? 'sr-RS' : 'en-US';
   const formatter = new Intl.NumberFormat(numberLocale);
 
+  /*
+   * One long, steep ease-out for every counter: most of the distance is
+   * covered early, then the last digits tick ever more slowly into place,
+   * so each number settles on its value instead of stopping short. Small
+   * and large numbers decelerate the same way; they start from zero only
+   * once seen (the markup holds the final value until then).
+   */
   gsap.utils.toArray<HTMLElement>('[data-counter]').forEach((el) => {
     const target = parseFloat(el.dataset.counter ?? '0');
     const state = { value: 0 };
+    let shown = '';
+    const render = () => {
+      const text = formatter.format(Math.round(state.value));
+      if (text !== shown) el.textContent = shown = text;
+    };
     gsap.to(state, {
       value: target,
-      duration: 1.9,
-      ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 85%', once: true },
-      onUpdate: () => {
-        el.textContent = formatter.format(Math.round(state.value));
-      },
+      duration: 2.8,
+      delay: parseFloat(el.dataset.counterDelay ?? '0'),
+      ease: 'power4.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true },
+      onStart: render,
+      onUpdate: render,
     });
+    render();
   });
 
   /* ── In-view state (CSS does the animating) ────────────────────── */

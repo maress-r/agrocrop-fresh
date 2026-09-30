@@ -4,7 +4,7 @@ export const sr: Dictionary = {
   meta: {
     title: 'Agrocrop Fresh — Sveža paprika iz Srema | Babura i šilja',
     description:
-      'Porodična proizvodnja paprike od 1975. godine. Petnaest hektara savremenih plastenika i staklenika, 2.500 tona godišnje, GLOBALG.A.P. sertifikat i izvoz na evropsko tržište.',
+      'Porodična proizvodnja paprike od 1975. godine. Deset hektara savremenih plastenika i staklenika, planirano 3.000 tona godišnje, GLOBALG.A.P. sertifikat i izvoz na evropsko tržište.',
     ogLocale: 'sr_RS',
   },
 
@@ -22,7 +22,7 @@ export const sr: Dictionary = {
     kicker: 'Hidroponska proizvodnja · Vojvodina, Srbija',
     titleLine1: 'Sveža paprika,',
     titleLine2: 'cele godine.',
-    lede: 'Babura i šilja iz kontrolisane proizvodnje na 15 hektara savremenih plastenika i staklenika — konzistentan kvalitet za veletrgovce, maloprodajne lance, prerađivače i izvoznike.',
+    lede: 'Babura i šilja iz kontrolisane proizvodnje na 10 hektara savremenih plastenika i staklenika — konzistentan kvalitet za veletrgovce, maloprodajne lance, prerađivače i izvoznike.',
     ctaPrimary: 'Zatražite ponudu',
     ctaSecondary: 'Naši proizvodi',
     scroll: 'Skrolujte',
@@ -67,16 +67,86 @@ export const sr: Dictionary = {
   production: {
     kicker: 'Proizvodnja',
     title: 'Kontrolisani uslovi. Konzistentan rezultat.',
-    lede: 'Svaka faza — od rasada do berbe — odvija se u zaštićenom prostoru pod stalnim nadzorom. Zato naša paprika izgleda isto u martu i u novembru.',
+    lede: 'Svaka faza — od rasada do berbe — odvija se u zaštićenom prostoru, pod stalnim nadzorom sistema i ljudi. Zato naša paprika izgleda isto u martu i u novembru.',
+    stepsLabel: 'Koraci proizvodnje',
+    steps: [
+      {
+        id: 'hydro',
+        label: 'Hidroponski uzgoj',
+        title: 'Voda i hrana stižu pravo do korena',
+        paragraphs: [
+          'Papriku uzgajamo hidroponski, bez zemlje. Koren raste u supstratu od kokosovih vlakana, a sve što je biljci potrebno dobija kroz vodu.',
+          'Hraniva su rastvorena u vodi za navodnjavanje. Taj hranljivi rastvor kroz sistem kapaljki stiže do svake biljke, direktno u zonu korena – zato tačno znamo koliko je vode i hrane biljka dobila.',
+        ],
+      },
+      {
+        id: 'climate',
+        label: 'Kontrola klime',
+        title: 'U središtu je Priva',
+        paragraphs: [
+          'Proizvodnjom upravlja Priva – sistem za automatsko vođenje uslova u plasteniku. Senzori neprekidno mere temperaturu i vlažnost vazduha, a Priva ih poredi sa vrednostima koje smo zadali i reaguje čim nešto odstupi.',
+          'Iz jednog sistema vodimo klimu, grejanje i ishranu biljaka, pa su uslovi stabilni i danju i noću.',
+        ],
+      },
+      {
+        id: 'heat',
+        label: 'Grejanje',
+        title: 'Toplota tačno kada je potrebna',
+        paragraphs: [
+          'Plastenici su opremljeni termogenima – uređajima koji zagrevaju vazduh i tako regulišu temperaturu u plasteniku. Kada temperatura padne ispod zadate vrednosti, Priva ih uključuje, a kada je dostignuta – isključuje.',
+          'Biljka tako raste u stabilnim uslovima, bez obzira na to kakvo je vreme napolju.',
+        ],
+      },
+      {
+        id: 'feed',
+        label: 'Ishrana biljaka',
+        title: 'Onoliko koliko biljci treba',
+        paragraphs: [
+          'I ishranu biljaka vodi Priva. Sistem precizno izračunava količinu vode i hraniva i prilagođava je potrebama biljke u svakoj fazi rasta.',
+          'Hraniva se doziraju u vodu, a gotov rastvor kroz kapaljke stiže do svake biljke.',
+        ],
+      },
+      {
+        id: 'people',
+        label: 'Svakodnevni rad',
+        title: 'Sistem meri. Ljudi poznaju biljku.',
+        paragraphs: [
+          'Automatizacija nam daje preciznost, ali ne zamenjuje iskustvo. Naši ljudi svakog dana obilaze plastenike, prate kako biljke rastu i u kakvom su stanju list i plod, i primećuju ono što nijedan senzor ne vidi.',
+          'Na osnovu toga podešavamo i ono što sistem radi – jer dobar rod ne dolazi samo od tehnike, već i od pažnje.',
+        ],
+      },
+    ],
+    scene: {
+      priva: 'Priva',
+      climate: 'Klima',
+      heating: 'Grejanje',
+      feeding: 'Ishrana',
+      substrate: 'Kokosov supstrat',
+      dripper: 'Kapaljka',
+      solution: 'Hranljivi rastvor',
+      heater: 'Termogen',
+      warmAir: 'Topao vazduh',
+      sensor: 'Merenje temperature',
+      water: 'Voda',
+      nutrients: 'Hraniva',
+      toPlants: 'Do svake biljke',
+    },
+    chart: {
+      inside: 'U plasteniku',
+      outside: 'Napolju',
+      setpoint: 'Zadata temperatura',
+      heaters: 'Termogeni uključeni',
+      day: 'Dan',
+      night: 'Noć',
+    },
+    qualityLink: 'Kako štitimo biljke',
+    statsTitle: 'Površina i obim proizvodnje',
     stats: [
-      { value: '15', suffix: 'ha', label: 'savremenih plastenika i staklenika' },
-      { value: '2.500', suffix: 't', label: 'godišnja proizvodnja paprike' },
+      { value: '10', suffix: 'ha', label: 'savremenih plastenika i staklenika' },
+      { value: '3.000', suffix: 't', label: 'planirana godišnja proizvodnja paprike' },
       { value: '400', suffix: 't', label: 'kapacitet hladnjača' },
       { value: '2.500', suffix: 'm²', label: 'pakirni centar' },
     ],
-    bioTitle: 'Biološka zaštita bilja',
-    bioText:
-      'Prednost dajemo prirodnim mehanizmima zaštite — korisni organizmi čuvaju useve, a plod ostaje čist, bezbedan i spreman za najzahtevnija tržišta.',
   },
 
   products: {

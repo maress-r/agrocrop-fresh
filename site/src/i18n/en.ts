@@ -4,7 +4,7 @@ export const en: Dictionary = {
   meta: {
     title: 'Agrocrop Fresh — Fresh Peppers from Serbia | White Bell & Sweet Pointed',
     description:
-      'Family-run pepper production since 1975. Fifteen hectares of modern greenhouses, 2,500 tonnes per year, GLOBALG.A.P. certified, exporting across the European market.',
+      'Family-run pepper production since 1975. Ten hectares of modern greenhouses, a planned 3,000 tonnes per year, GLOBALG.A.P. certified, exporting across the European market.',
     ogLocale: 'en_US',
   },
 
@@ -22,7 +22,7 @@ export const en: Dictionary = {
     kicker: 'Hydroponic production · Vojvodina, Serbia',
     titleLine1: 'Fresh peppers,',
     titleLine2: 'all year round.',
-    lede: 'White bell (babura) and sweet pointed (šilja) peppers from 15 hectares of controlled greenhouse production — consistent quality for wholesalers, retail chains, processors and exporters.',
+    lede: 'White bell (babura) and sweet pointed (šilja) peppers from 10 hectares of controlled greenhouse production — consistent quality for wholesalers, retail chains, processors and exporters.',
     ctaPrimary: 'Request a quote',
     ctaSecondary: 'Our products',
     scroll: 'Scroll',
@@ -67,16 +67,86 @@ export const en: Dictionary = {
   production: {
     kicker: 'Production',
     title: 'Controlled conditions. Consistent results.',
-    lede: 'Every stage — from seedling to harvest — takes place under cover and constant supervision. That is why our peppers look the same in March and in November.',
+    lede: 'Every stage — from seedling to harvest — takes place under cover, constantly watched over by both the system and our people. That is why our peppers look the same in March and in November.',
+    stepsLabel: 'Production steps',
+    steps: [
+      {
+        id: 'hydro',
+        label: 'Hydroponic growing',
+        title: 'Water and food straight to the roots',
+        paragraphs: [
+          'We grow our peppers hydroponically, without soil. The roots grow in a coconut-fibre substrate, and everything the plant needs reaches it through water.',
+          'Nutrients are dissolved in the irrigation water, and this nutrient solution reaches every plant through a drip system, directly into the root zone – so we know exactly how much water and food each plant has received.',
+        ],
+      },
+      {
+        id: 'climate',
+        label: 'Climate control',
+        title: 'Priva at the centre',
+        paragraphs: [
+          'Production is run by Priva – a system that automatically controls the conditions in the greenhouse. Sensors constantly measure air temperature and humidity; Priva compares them with the values we have set and responds as soon as anything drifts.',
+          'From one system we run the climate, heating and plant nutrition, so conditions stay stable day and night.',
+        ],
+      },
+      {
+        id: 'heat',
+        label: 'Heating',
+        title: 'Warmth exactly when it is needed',
+        paragraphs: [
+          'The greenhouses are fitted with hot-air heaters that warm the air and so regulate the temperature inside. When it drops below the set value, Priva switches them on; once it is reached, it switches them off.',
+          'The plants grow in stable conditions, whatever the weather outside.',
+        ],
+      },
+      {
+        id: 'feed',
+        label: 'Plant nutrition',
+        title: 'As much as the plant needs',
+        paragraphs: [
+          'Plant nutrition is run by Priva too. The system precisely calculates the amount of water and nutrients and adjusts it to what the plants need at every stage of growth.',
+          'The nutrients are dosed into the water, and the ready solution reaches every plant through the drippers.',
+        ],
+      },
+      {
+        id: 'people',
+        label: 'Daily work',
+        title: 'The system measures. People know the plant.',
+        paragraphs: [
+          'Automation gives us precision, but it does not replace experience. Our people walk the greenhouses every day, follow how the plants are growing and the condition of leaf and fruit, and notice what no sensor can see.',
+          'That is what our adjustments to the system are based on – because a good crop comes not from technology alone, but from care.',
+        ],
+      },
+    ],
+    scene: {
+      priva: 'Priva',
+      climate: 'Climate',
+      heating: 'Heating',
+      feeding: 'Nutrition',
+      substrate: 'Coconut substrate',
+      dripper: 'Dripper',
+      solution: 'Nutrient solution',
+      heater: 'Air heater',
+      warmAir: 'Warm air',
+      sensor: 'Temperature reading',
+      water: 'Water',
+      nutrients: 'Nutrients',
+      toPlants: 'To every plant',
+    },
+    chart: {
+      inside: 'In the greenhouse',
+      outside: 'Outside',
+      setpoint: 'Set temperature',
+      heaters: 'Heaters on',
+      day: 'Day',
+      night: 'Night',
+    },
+    qualityLink: 'How we protect the plants',
+    statsTitle: 'Area and scale of production',
     stats: [
-      { value: '15', suffix: 'ha', label: 'of modern greenhouses' },
-      { value: '2,500', suffix: 't', label: 'of peppers produced annually' },
+      { value: '10', suffix: 'ha', label: 'of modern greenhouses' },
+      { value: '3,000', suffix: 't', label: 'planned annual pepper production' },
       { value: '400', suffix: 't', label: 'of cold storage capacity' },
       { value: '2,500', suffix: 'm²', label: 'packing centre' },
     ],
-    bioTitle: 'Biological crop protection',
-    bioText:
-      'We favour natural protection mechanisms — beneficial organisms keep the crops healthy, so the fruit stays clean, safe and ready for the most demanding markets.',
   },
 
   products: {

@@ -1,0 +1,220 @@
+---
+/**
+ * Heating, as a small schematic chart over a day, a night and a day:
+ * outside the temperature swings; when it falls below the set temperature
+ * the heaters come on, and the greenhouse stays just above it throughout.
+ * Illustrative only — no scale or measured values.
+ *
+ * Lines draw in once seen ([data-inview], global.css); the heater bar and
+ * the switch points follow.
+ */
+interface Props {
+  labels: { inside: string; outside: string; setpoint: string; heaters: string; day: string; night: string };
+  class?: string;
+}
+
+const { labels, class: className } = Astro.props;
+
+const W = 360;
+/** Set temperature, as a y coordinate (smaller is warmer). */
+const SET = 58;
+/** One day and one night, from the warmest point of the first day. */
+const PERIOD = 264;
+const PEAK = 22;
+const TRACK = 106;
+
+const outside = (x: number) => SET - 34 * Math.cos((2 * Math.PI * (x - PEAK)) / PERIOD);
+const inside = (x: number) => SET - 8 + 1.6 * Math.sin((2 * Math.PI * x) / 96);
+
+/** Where the outside line crosses the set temperature: heaters on between. */
+const on = [PEAK + PERIOD / 4, PEAK + (3 * PERIOD) / 4] as const;
+
+const r1 = (n: number) => Math.round(n * 10) / 10;
+
+/** Smooth path through samples of f (Catmull-Rom as cubic Béziers). */
+function curve(f: (x: number) => number) {
+  const pts: [number, number][] = [];
+  for (let x = 0; x <= W; x += 8) pts.push([x, f(x)]);
+  let d = `M${pts[0]![0]} ${r1(pts[0]![1])}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)]!;
+    const p1 = pts[i]!;
+    const p2 = pts[i + 1]!;
+    const p3 = pts[Math.min(pts.length - 1, i + 2)]!;
+    d +=
+      `C${r1(p1[0] + (p2[0] - p0[0]) / 6)} ${r1(p1[1] + (p2[1] - p0[1]) / 6)} ` +
+      `${r1(p2[0] - (p3[0] - p1[0]) / 6)} ${r1(p2[1] - (p3[1] - p1[1]) / 6)} ${p2[0]} ${r1(p2[1])}`;
+  }
+  return d;
+}
+
+const pct = (x: number) => `${((x / W) * 100).toFixed(2)}%`;
+const ticks = [
+  { x: PEAK, label: labels.day },
+  { x: PEAK + PERIOD / 2, label: labels.night },
+  { x: PEAK + PERIOD, label: labels.day },
+];
+---
+
+<figure class:list={['heat-chart', className]} data-inview aria-hidden="true">
+  <svg viewBox={`0 0 ${W} 116`} class="heat-plot">
+    <path class="heat-set" d={`M0 ${SET}H${W}`} />
+    <path class="heat-guide" d={on.map((x) => `M${x} ${SET}V${TRACK - 4}`).join('')} />
+    <path class="heat-outside draw" d={curve(outside)} pathLength="1" />
+    <path class="heat-inside draw" d={curve(inside)} pathLength="1" style="--draw-delay: 0.35s" />
+    {on.map((x) => <circle class="heat-switch" cx={x} cy={SET} r="3" />)}
+    <rect class="heat-track" x="0" y={TRACK} width={W} height="6" rx="3" />
+    <rect class="heat-on" x={on[0]} y={TRACK} width={on[1] - on[0]} height="6" rx="3" />
+  </svg>
+
+  <div class="heat-axis">
+    {ticks.map((t) => <span style={`left: ${pct(t.x)}`}>{t.label}</span>)}
+  </div>
+
+  <figcaption class="heat-legend">
+    <span class="heat-key" data-key="inside">{labels.inside}</span>
+    <span class="heat-key" data-key="outside">{labels.outside}</span>
+    <span class="heat-key" data-key="setpoint">{labels.setpoint}</span>
+    <span class="heat-key" data-key="heaters">{labels.heaters}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .heat-chart {
+    max-width: 26rem;
+    border: 1px solid color-mix(in srgb, var(--color-sage-300) 16%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in srgb, var(--color-forest-800) 55%, var(--color-forest-900));
+    padding: 1.25rem 1.25rem 1.125rem;
+  }
+
+  .heat-plot {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .heat-set {
+    stroke: color-mix(in srgb, var(--color-cream-50) 45%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 3 5;
+  }
+
+  .heat-outside {
+    stroke: var(--color-sage-300);
+    stroke-width: 1.5;
+  }
+
+  .heat-inside {
+    stroke: var(--color-ember-400);
+    stroke-width: 2.25;
+  }
+
+  .heat-guide {
+    stroke: color-mix(in srgb, var(--color-ember-400) 55%, transparent);
+    stroke-width: 1;
+    stroke-dasharray: 1 4;
+  }
+
+  .heat-switch {
+    fill: var(--color-ember-400);
+  }
+
+  .heat-track {
+    fill: color-mix(in srgb, var(--color-sage-300) 14%, transparent);
+  }
+
+  .heat-on {
+    fill: var(--color-ember-400);
+    transform-box: fill-box;
+    transform-origin: left center;
+  }
+
+  .heat-axis {
+    position: relative;
+    height: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-sage-300);
+  }
+
+  .heat-axis span {
+    position: absolute;
+    top: 0;
+    translate: -50% 0;
+  }
+
+  .heat-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.125rem;
+    border-top: 1px solid color-mix(in srgb, var(--color-sage-300) 16%, transparent);
+    padding-top: 1rem;
+    font-size: 0.8125rem;
+    color: var(--color-sage-200);
+  }
+
+  .heat-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .heat-key::before {
+    content: '';
+    width: 1.25rem;
+    flex: none;
+  }
+
+  .heat-key[data-key='inside']::before {
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-ember-400);
+  }
+
+  .heat-key[data-key='outside']::before {
+    height: 1.5px;
+    background: var(--color-sage-300);
+  }
+
+  .heat-key[data-key='setpoint']::before {
+    height: 1px;
+    background: repeating-linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-cream-50) 60%, transparent) 0 3px,
+      transparent 3px 7px
+    );
+  }
+
+  .heat-key[data-key='heaters']::before {
+    height: 6px;
+    border-radius: 3px;
+    background: var(--color-ember-400);
+  }
+
+  /* The switch points and the heater bar follow the drawn lines. */
+  .heat-on {
+    transition: scale 0.9s var(--ease-out-quart) 1.1s;
+  }
+
+  .heat-switch,
+  .heat-guide {
+    transition: opacity 0.5s ease-out 1s;
+  }
+
+  :global(html.has-motion) .heat-chart:not(:global(.is-inview)) .heat-on {
+    scale: 0 1;
+  }
+
+  :global(html.has-motion) .heat-chart:not(:global(.is-inview)) :is(.heat-switch, .heat-guide) {
+    opacity: 0;
+  }
+</style>
