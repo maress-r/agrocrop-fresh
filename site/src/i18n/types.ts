@@ -26,6 +26,26 @@ export interface Pillar {
   text: string;
 }
 
+/** A beneficial-organism system from Biobest (facts from the product pages). */
+export interface BeneficialItem {
+  id: 'propylea' | 'orius' | 'swirskii' | 'micromus';
+  name: string;
+  /** What the organism is, e.g. "Predatory mite". */
+  organism: string;
+  /** The pests it controls. */
+  target: string;
+  fact: string;
+}
+
+export interface StandardItem {
+  id: 'globalgap' | 'grasp';
+  name: string;
+  subtitle: string;
+  text: string;
+  /** How compliance is confirmed. */
+  note: string;
+}
+
 export interface Dictionary {
   meta: {
     title: string;
@@ -69,11 +89,42 @@ export interface Dictionary {
     lede: string;
     items: ProductItem[];
   };
+  /** Section 04, told as one path: balance → beneficials → treatments → standards. */
   quality: {
     kicker: string;
     title: string;
     lede: string;
-    pillars: Pillar[];
+    /** Accessible name of the chapter navigation. */
+    pathLabel: string;
+    balance: {
+      label: string;
+      title: string;
+      lead: string;
+      /** Revealed on demand. */
+      more: string;
+      statement: string;
+      readMore: string;
+      readLess: string;
+    };
+    beneficials: {
+      label: string;
+      title: string;
+      intro: string;
+      targetLabel: string;
+      source: string;
+      items: BeneficialItem[];
+    };
+    treatments: {
+      label: string;
+      title: string;
+      text: string;
+      steps: Pillar[];
+    };
+    standards: {
+      label: string;
+      title: string;
+      items: StandardItem[];
+    };
   };
   logistics: {
     kicker: string;
@@ -126,5 +177,7 @@ export interface Dictionary {
     lightboxPrev: string;
     lightboxNext: string;
     galleryOpen: string;
+    /** Appended to links that open in a new tab. */
+    newTab: string;
   };
 }

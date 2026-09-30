@@ -1,0 +1,162 @@
+---
+/**
+ * Card whose border lights up towards the pointer — a lean, dependency-free
+ * take on React Bits' Border Glow, in the site palette.
+ *
+ * The lit arc faces the pointer from the card's centre and brightens as the
+ * pointer nears the edge (--glow-angle, --glow-edge from
+ * scripts/border-glow.ts). Touch lights it where the finger lands; keyboard
+ * focus inside the card lets the light circle slowly.
+ */
+interface Props {
+  as?: 'article' | 'div' | 'li';
+  class?: string;
+}
+
+const { as: Tag = 'article', class: className } = Astro.props;
+---
+
+<Tag class:list={['glow-card', className]} data-border-glow>
+  <span class="glow-card-halo" aria-hidden="true"></span>
+  <div class="glow-card-body">
+    <slot />
+  </div>
+</Tag>
+
+<style>
+  @property --glow-angle {
+    syntax: '<angle>';
+    inherits: true;
+    initial-value: 45deg;
+  }
+
+  @property --glow-edge {
+    syntax: '<number>';
+    inherits: true;
+    initial-value: 0;
+  }
+
+  .glow-card {
+    --glow-surface: color-mix(in srgb, var(--color-forest-900) 45%, var(--color-forest-800));
+    --glow-on: 0;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid color-mix(in srgb, var(--color-sage-300) 24%, transparent);
+    border-radius: 1.25rem;
+    background: var(--glow-surface);
+    transition: border-color 0.4s var(--ease-out-quart);
+  }
+
+  .glow-card:global(.is-lit),
+  .glow-card:global(.is-sweeping),
+  .glow-card:has(:focus-visible) {
+    --glow-on: 1;
+    border-color: color-mix(in srgb, var(--color-sage-300) 34%, transparent);
+  }
+
+  /* The lit arc: a warm mesh in the border box, the card's own surface in
+     the padding box, cut to a cone facing the pointer. */
+  .glow-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border: 1px solid transparent;
+    border-radius: inherit;
+    background:
+      linear-gradient(var(--glow-surface), var(--glow-surface)) padding-box,
+      radial-gradient(at 20% 10%, var(--color-cream-50), transparent 45%) border-box,
+      radial-gradient(at 85% 25%, var(--color-ember-400), transparent 60%) border-box,
+      radial-gradient(at 75% 95%, var(--color-earth-400), transparent 60%) border-box,
+      radial-gradient(at 5% 85%, var(--color-ember-500), transparent 60%) border-box,
+      linear-gradient(var(--color-ember-400), var(--color-ember-400)) border-box;
+    -webkit-mask-image: conic-gradient(from var(--glow-angle), #000 0 11%, transparent 28% 72%, #000 89%);
+    mask-image: conic-gradient(from var(--glow-angle), #000 0 11%, transparent 28% 72%, #000 89%);
+    opacity: calc(var(--glow-on) * (0.35 + 0.65 * var(--glow-edge)));
+    transition: opacity 0.35s var(--ease-out-quart);
+  }
+
+  /* Soft light spilling past the edge, narrower than the arc. */
+  .glow-card-halo {
+    --spill: 2.5rem;
+    position: absolute;
+    inset: calc(var(--spill) * -1);
+    pointer-events: none;
+    -webkit-mask-image: conic-gradient(from var(--glow-angle), #000 0 4%, transparent 14% 86%, #000 96%);
+    mask-image: conic-gradient(from var(--glow-angle), #000 0 4%, transparent 14% 86%, #000 96%);
+    mix-blend-mode: plus-lighter;
+    opacity: calc(var(--glow-on) * var(--glow-edge));
+    transition: opacity 0.35s var(--ease-out-quart);
+  }
+
+  .glow-card-halo::before {
+    content: '';
+    position: absolute;
+    inset: var(--spill);
+    border-radius: 1.25rem;
+    box-shadow:
+      inset 0 0 0 1px color-mix(in srgb, var(--color-ember-400) 80%, transparent),
+      inset 0 0 6px color-mix(in srgb, var(--color-ember-400) 32%, transparent),
+      inset 0 0 20px color-mix(in srgb, var(--color-ember-400) 12%, transparent),
+      0 0 2px color-mix(in srgb, var(--color-ember-400) 60%, transparent),
+      0 0 10px color-mix(in srgb, var(--color-ember-400) 32%, transparent),
+      0 0 26px 2px color-mix(in srgb, var(--color-ember-400) 16%, transparent),
+      0 0 48px 4px color-mix(in srgb, var(--color-ember-400) 7%, transparent);
+  }
+
+  .glow-card-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  /* Keyboard focus inside: full strength, circling slowly. */
+  .glow-card:has(:focus-visible) {
+    --glow-edge: 1 !important;
+    animation: glow-orbit 6s linear infinite;
+  }
+
+  /* One sweep round the border (touch screens, first time in view). */
+  .glow-card:global(.is-sweeping) {
+    animation: glow-sweep 2.6s var(--ease-in-out-quart) both;
+  }
+
+  @keyframes glow-orbit {
+    from {
+      --glow-angle: 0deg;
+    }
+    to {
+      --glow-angle: 360deg;
+    }
+  }
+
+  @keyframes glow-sweep {
+    0% {
+      --glow-angle: 110deg;
+      --glow-edge: 0;
+    }
+    25%,
+    75% {
+      --glow-edge: 1;
+    }
+    100% {
+      --glow-angle: 470deg;
+      --glow-edge: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glow-card:has(:focus-visible),
+    .glow-card:global(.is-sweeping) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/border-glow';
+</script>

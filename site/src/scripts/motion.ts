@@ -11,6 +11,8 @@
  *    data-parallax="10"           scrubbed vertical drift (yPercent)
  *    data-counter="2500"          count-up number, locale-formatted
  *    data-viewport-play           <video> plays only while in viewport
+ *    data-inview                  gets `is-inview` once seen; CSS animates
+ *                                 (e.g. line drawings, global.css)
  *
  *  Respects prefers-reduced-motion: the module exits early and the
  *  `has-motion` class (set in <head>) is removed, so all content is
@@ -171,6 +173,16 @@ function init(): void {
       onUpdate: () => {
         el.textContent = formatter.format(Math.round(state.value));
       },
+    });
+  });
+
+  /* ── In-view state (CSS does the animating) ────────────────────── */
+  gsap.utils.toArray<HTMLElement>('[data-inview]').forEach((el) => {
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 82%',
+      once: true,
+      onEnter: () => el.classList.add('is-inview'),
     });
   });
 

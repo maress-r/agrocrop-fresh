@@ -176,6 +176,25 @@ html.has-motion [data-hero-line] {
   transform: translateY(112%);
 }
 
+/* Line drawings inside [data-inview] draw themselves once seen: strokes
+   carry pathLength="1"; .draw-accent shapes follow. --draw-delay staggers. */
+[data-inview] [pathLength] {
+  stroke-dasharray: 1;
+  transition: stroke-dashoffset 1.6s var(--ease-out-quart) var(--draw-delay, 0s);
+}
+
+[data-inview] .draw-accent {
+  transition: opacity 0.6s ease-out calc(var(--draw-delay, 0s) + 0.9s);
+}
+
+html.has-motion [data-inview]:not(.is-inview) [pathLength] {
+  stroke-dashoffset: 1;
+}
+
+html.has-motion [data-inview]:not(.is-inview) .draw-accent {
+  opacity: 0;
+}
+
 /* Filmic grain overlay for video/photo surfaces */
 @utility grain {
   position: relative;

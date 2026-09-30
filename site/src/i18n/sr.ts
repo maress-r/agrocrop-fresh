@@ -107,24 +107,92 @@ export const sr: Dictionary = {
     kicker: 'Kvalitet',
     title: 'Standard koji se proverava, ne obećava.',
     lede: 'Kvalitet za nas nije marketinška reč nego procedura — sertifikovana, dokumentovana i vidljiva u svakoj gajbici koja napusti pakirni centar.',
-    pillars: [
-      {
-        title: 'GLOBALG.A.P. sertifikat',
-        text: 'Proizvodnja usklađena sa najstrožim međunarodnim standardom dobre poljoprivredne prakse — uslov za police vodećih evropskih lanaca.',
-      },
-      {
-        title: 'Biološka zaštita',
-        text: 'Zdravlje biljaka čuvamo prirodnim mehanizmima, uz minimalnu upotrebu hemijskih sredstava i punu bezbednost ploda.',
-      },
-      {
-        title: 'Hladni lanac',
-        text: 'Hladnjače kapaciteta 400 tona obezbeđuju da paprika od berbe do isporuke zadrži punu svežinu, čvrstinu i ukus.',
-      },
-      {
-        title: 'Sledljivost',
-        text: 'Svaka isporuka nosi potpunu dokumentaciju — od parcele i datuma berbe do kupca. Poverenje se gradi podacima.',
-      },
-    ],
+    pathLabel: 'Koraci: od biološke zaštite do standarda',
+    balance: {
+      label: 'Biološka zaštita',
+      title: 'Ravnoteža pre intervencije',
+      lead: 'U savremenoj proizvodnji paprike zaštita biljaka za nas ne počinje prskanjem. Počinje svakodnevnim praćenjem useva i održavanjem prirodne ravnoteže u plasteniku. Zato u proizvodnju planski uvodimo korisne organizme – prirodne neprijatelje štetočina, koji nam pomažu da njihovu brojnost držimo pod kontrolom.',
+      more: 'Redovnim monitoringom pratimo stanje biljaka i prisustvo štetočina, a odluke donosimo na osnovu stvarnog stanja u proizvodnji. Na taj način biološku zaštitu povezujemo sa drugim merama integralne zaštite, sa ciljem da smanjimo potrebu za hemijskim tretmanima, očuvamo korisne organizme i proizvedemo zdrav i kvalitetan plod.',
+      statement: 'Za nas biološka zaštita nije samo zamena jednog preparata drugim. Ona je deo načina na koji želimo da proizvodimo – preciznije, odgovornije i sa što manjim opterećenjem biljke i životne sredine.',
+      readMore: 'Kako to radimo',
+      readLess: 'Prikažite manje',
+    },
+    beneficials: {
+      label: 'Korisni organizmi',
+      title: 'Prirodni neprijatelji štetočina',
+      intro: 'Koristimo sisteme korisnih organizama kompanije Biobest – svaki od njih lovi određene štetočine.',
+      targetLabel: 'Suzbija',
+      source: 'Podaci o organizmima: Biobest.',
+      items: [
+        {
+          id: 'propylea',
+          name: 'Propylea-System',
+          organism: 'Bubamara sa 14 tačaka',
+          target: 'Lisne vaši',
+          fact: 'Larve i odrasle jedinke aktivno traže lisne vaši – jedna jedinka pojede i do 100 vaši dnevno.',
+        },
+        {
+          id: 'orius',
+          name: 'Orius-System',
+          organism: 'Grabljiva stenica',
+          target: 'Tripsi',
+          fact: 'Nimfe i odrasle jedinke napadaju tripse – odrasla ženka dnevno uništi i do 20 nimfi tripsa.',
+        },
+        {
+          id: 'swirskii',
+          name: 'Swirskii-System',
+          organism: 'Grabljiva grinja',
+          target: 'Tripsi i bela leptirasta vaš',
+          fact: 'Napada mlade larve tripsa i belu leptirastu vaš – u proseku 5 do 10 jedinki plena dnevno.',
+        },
+        {
+          id: 'micromus',
+          name: 'Micromus-System',
+          organism: 'Mrežokrilac',
+          target: 'Lisne vaši',
+          fact: 'Larva tokom razvoja pojede u proseku 130 vaši, a odrasla jedinka i do 100 dnevno.',
+        },
+      ],
+    },
+    treatments: {
+      label: 'Biološki preparati',
+      title: 'Ciljano i sa merom',
+      text: 'Pored svakodnevnog praćenja i korisnih organizama, biljke po potrebi štitimo i biološkim preparatima. Tretmane planiramo i primenjujemo kontrolisano – kada stanje useva to zaista zahteva i u meri koja čuva zdravlje biljke i kvalitet ploda. Biljka tako nije bez zaštite, a izbegavamo nepotrebno hemijsko opterećenje.',
+      steps: [
+        {
+          title: 'Praćenje',
+          text: 'Svakodnevno pratimo stanje biljaka i prisustvo štetočina.',
+        },
+        {
+          title: 'Procena',
+          text: 'Odluku donosimo na osnovu stvarnog stanja u proizvodnji.',
+        },
+        {
+          title: 'Ciljana primena',
+          text: 'Kada je potrebno, biljke tretiramo biološkim preparatom – planski i u pravoj meri.',
+        },
+      ],
+    },
+    standards: {
+      label: 'Standardi',
+      title: 'Ono što radimo, potvrđuju standardi',
+      items: [
+        {
+          id: 'globalgap',
+          name: 'GLOBALG.A.P.',
+          subtitle: 'IFA standard za voće i povrće',
+          text: 'Globalni standard odgovorne poljoprivredne proizvodnje. Obuhvata bezbednost hrane, zaštitu životne sredine, integralnu zaštitu bilja, sledljivost i zdravlje, bezbednost i dobrobit zaposlenih.',
+          note: 'Usklađenost svake godine proverava akreditovano, nezavisno sertifikaciono telo.',
+        },
+        {
+          id: 'grasp',
+          name: 'GRASP',
+          subtitle: 'Procena socijalne prakse',
+          text: 'Dodatak GLOBALG.A.P. standardu posvećen ljudima u proizvodnji – zdravlju, bezbednosti i dobrobiti zaposlenih, njihovom glasu, radnim i ljudskim pravima i zaštiti dece i mladih radnika.',
+          note: 'Potvrda o usklađenosti važi godinu dana.',
+        },
+      ],
+    },
   },
 
   logistics: {
@@ -197,5 +265,6 @@ export const sr: Dictionary = {
     lightboxPrev: 'Prethodna fotografija',
     lightboxNext: 'Sledeća fotografija',
     galleryOpen: 'Uvećajte fotografiju',
+    newTab: 'otvara se u novoj kartici',
   },
 };

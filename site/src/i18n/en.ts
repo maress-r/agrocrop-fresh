@@ -107,24 +107,92 @@ export const en: Dictionary = {
     kicker: 'Quality',
     title: 'A standard that is verified, not promised.',
     lede: 'For us, quality is not a marketing word but a procedure — certified, documented and visible in every crate that leaves the packing centre.',
-    pillars: [
-      {
-        title: 'GLOBALG.A.P. certificate',
-        text: 'Production aligned with the strictest international standard of good agricultural practice — the entry ticket to leading European retail shelves.',
-      },
-      {
-        title: 'Biological protection',
-        text: 'Plant health is maintained through natural mechanisms, with minimal use of chemical agents and full fruit safety.',
-      },
-      {
-        title: 'Cold chain',
-        text: '400 tonnes of cold storage ensure the peppers keep their full freshness, firmness and taste from harvest to delivery.',
-      },
-      {
-        title: 'Traceability',
-        text: 'Every delivery carries complete documentation — from plot and harvest date to buyer. Trust is built on data.',
-      },
-    ],
+    pathLabel: 'Steps: from biological protection to standards',
+    balance: {
+      label: 'Biological protection',
+      title: 'Balance before intervention',
+      lead: 'In modern pepper production, plant protection for us does not begin with spraying. It begins with monitoring the crop every day and keeping the natural balance in the greenhouse. That is why we introduce beneficial organisms into production in a planned way – natural enemies of pests that help us keep their numbers under control.',
+      more: 'Through regular monitoring we track the condition of the plants and the presence of pests, and base our decisions on the actual situation in production. This is how we link biological protection with other integrated pest management measures – aiming to reduce the need for chemical treatments, preserve beneficial organisms and grow healthy, high-quality fruit.',
+      statement: 'For us, biological protection is not simply replacing one product with another. It is part of how we want to produce – more precisely, more responsibly and with as little burden as possible on the plant and the environment.',
+      readMore: 'How we do it',
+      readLess: 'Show less',
+    },
+    beneficials: {
+      label: 'Beneficial organisms',
+      title: 'Natural enemies of pests',
+      intro: 'We work with beneficial-organism systems from Biobest – each one hunts specific pests.',
+      targetLabel: 'Controls',
+      source: 'Organism details: Biobest.',
+      items: [
+        {
+          id: 'propylea',
+          name: 'Propylea-System',
+          organism: 'Fourteen-spotted ladybird',
+          target: 'Aphids',
+          fact: 'Larvae and adults actively hunt aphids – a single ladybird can eat up to 100 a day.',
+        },
+        {
+          id: 'orius',
+          name: 'Orius-System',
+          organism: 'Pirate bug',
+          target: 'Thrips',
+          fact: 'Nymphs and adults attack thrips – an adult female can kill up to 20 thrips nymphs a day.',
+        },
+        {
+          id: 'swirskii',
+          name: 'Swirskii-System',
+          organism: 'Predatory mite',
+          target: 'Thrips and whitefly',
+          fact: 'Attacks young thrips larvae and whiteflies – 5 to 10 prey a day on average.',
+        },
+        {
+          id: 'micromus',
+          name: 'Micromus-System',
+          organism: 'Brown lacewing',
+          target: 'Aphids',
+          fact: 'A larva eats 130 aphids on average during its development; an adult up to 100 a day.',
+        },
+      ],
+    },
+    treatments: {
+      label: 'Biological treatments',
+      title: 'Targeted and measured',
+      text: 'Alongside daily monitoring and beneficial organisms, we also protect the plants with biological preparations when needed. Treatments are planned and applied in a controlled way – when the condition of the crop truly calls for it, and in a measure that protects plant health and fruit quality. The plant is not left unprotected, and unnecessary chemical load is avoided.',
+      steps: [
+        {
+          title: 'Monitoring',
+          text: 'We check the plants and the presence of pests every day.',
+        },
+        {
+          title: 'Assessment',
+          text: 'Decisions are based on the actual situation in production.',
+        },
+        {
+          title: 'Targeted treatment',
+          text: 'When needed, the plants are treated with a biological preparation – planned and in the right measure.',
+        },
+      ],
+    },
+    standards: {
+      label: 'Standards',
+      title: 'Confirmed by international standards',
+      items: [
+        {
+          id: 'globalgap',
+          name: 'GLOBALG.A.P.',
+          subtitle: 'IFA standard for fruit and vegetables',
+          text: 'A global standard for responsible farming. It covers food safety, the environment, integrated pest management, traceability, and the health, safety and welfare of workers.',
+          note: 'Compliance is audited every year by an accredited, independent certification body.',
+        },
+        {
+          id: 'grasp',
+          name: 'GRASP',
+          subtitle: 'Risk Assessment on Social Practice',
+          text: 'A GLOBALG.A.P. add-on dedicated to the people in production – the health, safety and welfare of workers, their voice, labour and human rights, and the protection of children and young workers.',
+          note: 'The letter of conformance is valid for one year.',
+        },
+      ],
+    },
   },
 
   logistics: {
@@ -193,5 +261,6 @@ export const en: Dictionary = {
     lightboxPrev: 'Previous photo',
     lightboxNext: 'Next photo',
     galleryOpen: 'Enlarge photo',
+    newTab: 'opens in a new tab',
   },
 };
