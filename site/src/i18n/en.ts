@@ -151,7 +151,7 @@ export const en: Dictionary = {
     kicker: 'Gallery',
     title: 'Production worth seeing.',
     more: 'See more',
-    moreCount: '{count} photos',
+    moreCount: { one: '{count} photo', other: '{count} photos' },
     moreTitle: 'More from our production',
   },
 

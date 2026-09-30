@@ -1,0 +1,230 @@
+---
+/**
+ * Photo masonry for the gallery, laid out at build time.
+ *
+ * Each layout lists its columns top to bottom. Photos keep their own
+ * proportions; the few pixels a column falls short of the others are shared
+ * out across its photos (a crop of a percent or two), so every column ends
+ * on the same line. '+' marks where the `tile` slot goes: the foot of its
+ * column, taking whatever height is left there.
+ *
+ * Positions are calc() over the container width (cqw), so they hold at any
+ * size. The narrow layout applies until the container reaches 52rem.
+ * DOM order follows the wide layout's reading order (tab + lightbox order).
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Photo {
+  src: ImageMetadata;
+  alt: string;
+  /** Large version opened in the lightbox. */
+  full: string;
+}
+
+interface Props {
+  photos: Record<string, Photo>;
+  layout: { narrow: string[][]; wide: string[][] };
+  /** Prefix for each photo button's accessible name. */
+  label: string;
+  sizes: string;
+  /** Stagger the cells in on scroll (motion.ts). */
+  reveal?: boolean;
+  class?: string;
+}
+
+const { photos, layout, label, sizes, reveal = false, class: className } = Astro.props;
+
+const TILE = '+';
+const num = (n: number) => String(Math.round(n * 1e5) / 1e5);
+const ratio = (key: string) => photos[key]!.src.height / photos[key]!.src.width;
+
+const keys = Object.keys(photos);
+for (const [name, cols] of Object.entries(layout)) {
+  const placed = cols.flat().filter((k) => k !== TILE);
+  const missing = keys.filter((k) => !placed.includes(k));
+  const unknown = placed.filter((k) => !keys.includes(k));
+  if (missing.length || unknown.length || placed.length !== keys.length) {
+    throw new Error(`GalleryMasonry ${name} layout: missing [${missing}] unknown/duplicate [${unknown}]`);
+  }
+}
+
+type Cell = Record<string, string>;
+const cells = new Map<string, Cell>();
+const canvas: Record<string, string> = {};
+
+function place(cols: string[][], id: 'n' | 'w') {
+  const w = `var(--w${id})`;
+  const g = 'var(--g)';
+  const H = `var(--H${id})`;
+  const info = cols.map((col) => {
+    const photosIn = col.filter((k) => k !== TILE);
+    return {
+      keys: photosIn,
+      R: photosIn.reduce((sum, k) => sum + ratio(k), 0),
+      n: photosIn.length,
+      tile: col.includes(TILE),
+    };
+  });
+
+  canvas[`--w${id}`] = `calc((100cqw - ${cols.length - 1} * ${g}) / ${cols.length})`;
+  // With a tile, the tallest photo column sets the height (the tile keeps a
+  // minimum). Without one, columns meet at their average height.
+  canvas[`--H${id}`] = info.some((c) => c.tile)
+    ? `max(${info
+        .map((c) =>
+          c.tile
+            ? `${num(c.R)} * ${w} + ${c.n} * ${g} + var(--tile-min)`
+            : `${num(c.R)} * ${w} + ${c.n - 1} * ${g}`
+        )
+        .join(', ')})`
+    : `calc(${num(info.reduce((s, c) => s + c.R, 0) / cols.length)} * ${w} + ${num(
+        info.reduce((s, c) => s + c.n - 1, 0) / cols.length
+      )} * ${g})`;
+
+  info.forEach((c, ci) => {
+    // Height of one unit of aspect ratio in this column.
+    const unit = `--u${id}${ci}`;
+    canvas[unit] = c.tile ? w : `calc((${H} - ${c.n - 1} * ${g}) / ${num(c.R)})`;
+    const x = `calc(${ci} * (${w} + ${g}))`;
+    let above = 0;
+    c.keys.forEach((key, k) => {
+      const cell = cells.get(key) ?? {};
+      cell[`--x${id}`] = x;
+      cell[`--y${id}`] = `calc(${num(above)} * var(${unit}) + ${k} * ${g})`;
+      cell[`--h${id}`] = `calc(${num(ratio(key))} * var(${unit}))`;
+      cells.set(key, cell);
+      above += ratio(key);
+    });
+    if (c.tile) {
+      const cell = cells.get(TILE) ?? {};
+      const top = `${num(c.R)} * ${w} + ${c.n} * ${g}`;
+      cell[`--x${id}`] = x;
+      cell[`--y${id}`] = `calc(${top})`;
+      cell[`--h${id}`] = `calc(${H} - ${top.replaceAll(' + ', ' - ')})`;
+      cells.set(TILE, cell);
+    }
+  });
+}
+
+place(layout.narrow, 'n');
+place(layout.wide, 'w');
+
+const hasTile = cells.has(TILE);
+if (hasTile && !layout.narrow.flat().includes(TILE)) {
+  throw new Error('GalleryMasonry: the tile must be placed in both layouts');
+}
+
+// Reading order: by top edge in the wide layout, then left to right.
+const order = layout.wide
+  .flatMap((col, ci) => {
+    let top = 0;
+    return col
+      .filter((k) => k !== TILE)
+      .map((key) => {
+        const item = { key, top, ci };
+        top += ratio(key) + 0.05;
+        return item;
+      });
+  })
+  .sort((a, b) => a.top - b.top || a.ci - b.ci)
+  .map((item) => item.key);
+
+const style = (vars: Record<string, string>) =>
+  Object.entries(vars)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join('; ');
+---
+
+<div class:list={['masonry', className]}>
+  <div class="masonry-canvas" style={style(canvas)} data-reveal-group={reveal ? '' : undefined}>
+    {
+      order.map((key) => {
+        const photo = photos[key]!;
+        return (
+          <button
+            type="button"
+            class="masonry-cell group cursor-zoom-in overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ember-500"
+            style={style(cells.get(key)!)}
+            data-lightbox-trigger
+            data-full={photo.full}
+            aria-label={`${label}: ${photo.alt}`}
+          >
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              widths={[420, 640, 960]}
+              sizes={sizes}
+              class="h-full w-full object-cover transition-transform duration-700 ease-(--ease-out-quart) group-hover:scale-[1.045]"
+            />
+          </button>
+        );
+      })
+    }
+    {
+      hasTile && (
+        <div class="masonry-cell" style={style(cells.get(TILE)!)}>
+          <slot name="tile" />
+        </div>
+      )
+    }
+  </div>
+</div>
+
+<style>
+  .masonry {
+    container-type: inline-size;
+    --g: 1rem;
+    --tile-min: 7rem;
+  }
+
+  @media (min-width: 48rem) {
+    .masonry {
+      --g: 1.25rem;
+    }
+  }
+
+  .masonry-canvas {
+    position: relative;
+    height: var(--Hn);
+  }
+
+  .masonry-cell {
+    position: absolute;
+    left: var(--xn);
+    top: var(--yn);
+    width: var(--wn);
+    height: var(--hn);
+  }
+
+  @container (min-width: 52rem) {
+    .masonry-canvas {
+      height: var(--Hw);
+    }
+
+    .masonry-cell {
+      left: var(--xw);
+      top: var(--yw);
+      width: var(--ww);
+      height: var(--hw);
+    }
+  }
+
+  /* Without container units the photos simply flow in two columns. */
+  @supports not (width: 1cqw) {
+    .masonry-canvas {
+      height: auto;
+      columns: 2;
+      column-gap: 1rem;
+    }
+
+    .masonry-cell {
+      position: static;
+      display: block;
+      width: 100%;
+      height: auto;
+      margin-bottom: 1rem;
+      break-inside: avoid;
+    }
+  }
+</style>

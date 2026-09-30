@@ -3,7 +3,7 @@ import { Image } from 'astro:assets';
 import SectionHead from '../ui/SectionHead.astro';
 import { getDictionary, type Locale } from '../../i18n';
 
-import aerialComplex from '../../assets/photos/greenhouse-setup-clean.png';
+import greenhouseAisle from '../../assets/photos/greenhouse-block.jpg';
 
 interface Props {
   locale: Locale;
@@ -47,10 +47,10 @@ const rawValue = (v: string) => v.replace(/[.,\s]/g, '');
     <div class="mt-20 grid items-center gap-12 md:mt-28 lg:grid-cols-2 lg:gap-20">
       <figure class="overflow-hidden rounded-2xl" data-reveal>
         <Image
-          src={aerialComplex}
+          src={greenhouseAisle}
           alt={locale === 'sr'
-            ? 'Kompleks plastenika iz vazduha'
-            : 'Aerial view of the greenhouse complex'}
+            ? 'Prolaz kroz hidroponski plastenik'
+            : 'An aisle through the hydroponic greenhouse'}
           widths={[560, 900, 1400]}
           sizes="(min-width: 1024px) 46vw, 92vw"
           class="aspect-[16/10] w-full scale-[1.06] object-cover"

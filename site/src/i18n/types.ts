@@ -86,8 +86,8 @@ export interface Dictionary {
     title: string;
     /** "+" tile caption. */
     more: string;
-    /** Photo count, {count} is replaced. */
-    moreCount: string;
+    /** Photo count per plural category (Intl.PluralRules); {count} is replaced. */
+    moreCount: Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
     moreTitle: string;
   };
   contact: {
