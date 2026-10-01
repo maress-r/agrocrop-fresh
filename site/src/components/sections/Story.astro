@@ -139,6 +139,18 @@ const t = getDictionary(locale);
     }
   }
 
+  /* Phones: more room between chapters and a tighter feather, so more of
+     the plant shows between the blocks of text. */
+  @media (max-width: 767.98px) {
+    .story {
+      --chapter-gap: 52svh;
+    }
+
+    .story-chapter {
+      box-shadow: 0 0 0.75rem 0.5rem var(--color-cream-100);
+    }
+  }
+
   /* ── Camera mode (set by the script once it has taken over) ──────── */
 
   .story.is-camera .story-stage {

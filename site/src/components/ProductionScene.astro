@@ -314,10 +314,10 @@ const callouts = CALLOUTS.filter(
       <path d="M776 646H760V583H104" />
       <path
         d={PLANTS.map((px) => `M${px + 24} 580C${px + 31} 560 ${px + 29} 530 ${px + 15} 522`).join('')}
-        class="fine"
+        class="fine scene-dripper"
       />
-      <path d={PLANTS.map((px) => `M${px + 15} 522L${px + 9} 532`).join('')} class="scene-stake" />
-      {PLANTS.map((px) => <circle class="solid" cx={px + 24} cy="583" r="3.5" />)}
+      <path d={PLANTS.map((px) => `M${px + 15} 522L${px + 9} 532`).join('')} class="scene-stake scene-dripper" />
+      {PLANTS.map((px) => <circle class="scene-dripper scene-emitter" cx={px + 24} cy="583" r="3.5" />)}
       <path class="scene-flow" d="M776 646H760V583H104" />
       {PLANTS.map((px, i) => <circle class="scene-drop" cx={px + 8} cy="538" r="2.6" style={`--i: ${i}`} />)}
     </g>
@@ -463,6 +463,15 @@ const callouts = CALLOUTS.filter(
   .scene-dot {
     fill: currentColor;
     stroke: none;
+  }
+
+  /* Drippers in the accent colour, so they stand out from plant and fruit. */
+  .scene-dripper {
+    stroke: var(--color-ember-400);
+  }
+
+  .scene-emitter {
+    fill: var(--color-ember-400);
   }
 
   .scene-stake {

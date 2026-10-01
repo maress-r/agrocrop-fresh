@@ -9,7 +9,7 @@ export const sr: Dictionary = {
   },
 
   nav: {
-    story: 'O proizvodnji',
+    story: 'O nama',
     production: 'Proizvodnja',
     products: 'Proizvodi',
     quality: 'Kvalitet',
@@ -29,7 +29,7 @@ export const sr: Dictionary = {
   },
 
   story: {
-    kicker: 'O proizvodnji',
+    kicker: 'O nama',
     title:
       'Istorijat i razvojni put: Od porodične tradicije do lidera u hidroponskoj proizvodnji',
     chapters: [
