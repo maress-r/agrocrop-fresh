@@ -13,6 +13,7 @@ export const sr: Dictionary = {
     production: 'Proizvodnja',
     products: 'Proizvodi',
     quality: 'Kvalitet',
+    logistics: 'Logistika',
     gallery: 'Galerija',
     contact: 'Kontakt',
     cta: 'Zatražite ponudu',
@@ -190,9 +191,8 @@ export const sr: Dictionary = {
     beneficials: {
       label: 'Korisni organizmi',
       title: 'Prirodni neprijatelji štetočina',
-      intro: 'Koristimo sisteme korisnih organizama kompanije Biobest – svaki od njih lovi određene štetočine.',
+      intro: 'Koristimo sisteme korisnih organizama – svaki od njih lovi određene štetočine.',
       targetLabel: 'Suzbija',
-      source: 'Podaci o organizmima: Biobest.',
       items: [
         {
           id: 'propylea',
@@ -269,16 +269,24 @@ export const sr: Dictionary = {
     kicker: 'Logistika i izvoz',
     title: 'Od berbe do rampe kupca — bez zastoja.',
     lede: 'Pakirni centar od 2.500 m² i sopstvene hladnjače omogućavaju brzu pripremu robe po specifikaciji kupca i pouzdane isporuke na evropsko tržište.',
-    points: [
+    hall: { label: 'Pakirni centar', area: '2.500 m²' },
+    stepsLabel: 'Faze: od pakovanja do izvoza',
+    steps: [
       {
+        id: 'pack',
+        label: 'Pakovanje',
         title: 'Pakovanje po specifikaciji',
         text: 'Kartonska i plastična ambalaža, kalibraža i deklaracije prilagođene svakom kupcu i tržištu.',
       },
       {
+        id: 'cold',
+        label: 'Hladni lanac',
         title: 'Hladni lanac bez prekida',
         text: 'Roba se odmah po berbi hladi i čuva na optimalnoj temperaturi sve do utovara.',
       },
       {
+        id: 'export',
+        label: 'Izvoz',
         title: 'Izvoz na evropsko tržište',
         text: 'Redovne isporuke velikim trgovinskim lancima i distributerima u regionu i Evropskoj uniji.',
       },
@@ -315,6 +323,7 @@ export const sr: Dictionary = {
     hqHeading: 'Sedište',
     productionHeading: 'Proizvodno-distributivni centar',
     productionValue: 'Pećinci, Srem',
+    mapTitle: 'Mapa: proizvodno-distributivni centar, PG Đurđević, Pećinci',
   },
 
   footer: {

@@ -11,6 +11,9 @@ interface Props {
 const { locale } = Astro.props;
 const t = getDictionary(locale);
 
+/** Google's interface language for the map: Serbian in Latin script, like the site. */
+const mapSrc = site.address.production.mapEmbed.replaceAll('{lang}', locale === 'sr' ? 'sr-Latn' : 'en');
+
 const inputClass =
   'w-full rounded-lg border rule-dark bg-cream-50/[0.04] px-4 text-[0.9375rem] text-cream-50 placeholder:text-sage-300/45 transition-[border-color,background-color] duration-300 focus:border-ember-400 focus:bg-cream-50/[0.07] focus:outline-none';
 const labelClass = 'mb-2 block text-[0.8125rem] font-medium tracking-[0.04em] text-sage-200';
@@ -102,13 +105,41 @@ const labelClass = 'mb-2 block text-[0.8125rem] font-medium tracking-[0.04em] te
         </div>
 
         <div class="border-t rule-dark pt-8">
-          <h3 class="kicker mb-4 text-sage-300/80">{t.contact.productionHeading}</h3>
-          <p class="text-[1rem] leading-relaxed text-cream-50/85">{t.contact.productionValue}</p>
+          <h3 class="kicker mb-5 text-sage-300/80">{t.contact.productionHeading}</h3>
+          <div class="contact-map">
+            <iframe
+              src={mapSrc}
+              title={t.contact.mapTitle}
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen></iframe>
+          </div>
+          <p class="mt-5 text-[1rem] leading-relaxed text-cream-50/85">
+            <span class="block font-medium text-cream-50">{site.address.production.name}</span>
+            {t.contact.productionValue}
+          </p>
         </div>
       </div>
     </div>
   </div>
 </section>
+
+<style>
+  .contact-map {
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--color-sage-300) 26%, transparent);
+    border-radius: 1rem;
+    aspect-ratio: 16 / 10;
+    background: var(--color-forest-900);
+  }
+
+  .contact-map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>
 
 <script>
   /**

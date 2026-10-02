@@ -1,8 +1,10 @@
 ---
 /**
- * Heating, as a small schematic chart over a day, a night and a day:
- * outside the temperature swings; when it falls below the set temperature
- * the heaters come on, and the greenhouse stays just above it throughout.
+ * Heating, as a small schematic chart over a day, a night and a day.
+ * By day the heaters are off and the greenhouse follows the weather, a
+ * little warmer than outside. When the outside temperature falls below the
+ * set temperature the heaters come on and hold the greenhouse just above
+ * it — cycling on and off — until the morning warms it again.
  * Illustrative only — no scale or measured values.
  *
  * Lines draw in once seen ([data-inview], global.css); the heater bar and
@@ -23,8 +25,20 @@ const PERIOD = 264;
 const PEAK = 22;
 const TRACK = 106;
 
+/** How much warmer the greenhouse runs than its lower bound, in y units. */
+const GAIN = 8;
+
 const outside = (x: number) => SET - 34 * Math.cos((2 * Math.PI * (x - PEAK)) / PERIOD);
-const inside = (x: number) => SET - 8 + 1.6 * Math.sin((2 * Math.PI * x) / 96);
+
+/** Heated: held above the set temperature, rippling as the heaters cycle. */
+const held = (x: number) => SET - GAIN + 1.3 * Math.sin((2 * Math.PI * x) / 30);
+/** Unheated: the weather, plus what the greenhouse itself keeps in. */
+const unheated = (x: number) => outside(x) - GAIN;
+/** The warmer of the two (smaller y), eased where one hands over to the other. */
+const inside = (x: number) => {
+  const k = 2;
+  return -k * Math.log(Math.exp(-held(x) / k) + Math.exp(-unheated(x) / k));
+};
 
 /** Where the outside line crosses the set temperature: heaters on between. */
 const on = [PEAK + PERIOD / 4, PEAK + (3 * PERIOD) / 4] as const;
@@ -34,7 +48,7 @@ const r1 = (n: number) => Math.round(n * 10) / 10;
 /** Smooth path through samples of f (Catmull-Rom as cubic Béziers). */
 function curve(f: (x: number) => number) {
   const pts: [number, number][] = [];
-  for (let x = 0; x <= W; x += 8) pts.push([x, f(x)]);
+  for (let x = 0; x <= W; x += 5) pts.push([x, f(x)]);
   let d = `M${pts[0]![0]} ${r1(pts[0]![1])}`;
   for (let i = 0; i < pts.length - 1; i++) {
     const p0 = pts[Math.max(0, i - 1)]!;

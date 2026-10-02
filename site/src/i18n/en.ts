@@ -13,6 +13,7 @@ export const en: Dictionary = {
     production: 'Production',
     products: 'Products',
     quality: 'Quality',
+    logistics: 'Logistics',
     gallery: 'Gallery',
     contact: 'Contact',
     cta: 'Request a quote',
@@ -190,9 +191,8 @@ export const en: Dictionary = {
     beneficials: {
       label: 'Beneficial organisms',
       title: 'Natural enemies of pests',
-      intro: 'We work with beneficial-organism systems from Biobest – each one hunts specific pests.',
+      intro: 'We work with beneficial-organism systems – each one hunts specific pests.',
       targetLabel: 'Controls',
-      source: 'Organism details: Biobest.',
       items: [
         {
           id: 'propylea',
@@ -269,16 +269,24 @@ export const en: Dictionary = {
     kicker: 'Logistics & export',
     title: 'From harvest to your dock — without delay.',
     lede: 'A 2,500 m² packing centre and our own cold storage enable fast preparation to customer specification and reliable deliveries across the European market.',
-    points: [
+    hall: { label: 'Packing centre', area: '2,500 m²' },
+    stepsLabel: 'Phases: from packing to export',
+    steps: [
       {
+        id: 'pack',
+        label: 'Packing',
         title: 'Packing to specification',
         text: 'Cardboard and plastic packaging, sizing and labelling adapted to each buyer and market.',
       },
       {
+        id: 'cold',
+        label: 'Cold chain',
         title: 'Unbroken cold chain',
         text: 'Immediately after harvest, produce is cooled and kept at optimal temperature until loading.',
       },
       {
+        id: 'export',
+        label: 'Export',
         title: 'Export to European markets',
         text: 'Regular deliveries to major retail chains and distributors in the region and the European Union.',
       },
@@ -311,6 +319,7 @@ export const en: Dictionary = {
     hqHeading: 'Headquarters',
     productionHeading: 'Production & distribution centre',
     productionValue: 'Pećinci, Srem region',
+    mapTitle: 'Map: production and distribution centre, PG Đurđević, Pećinci',
   },
 
   footer: {

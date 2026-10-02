@@ -41,8 +41,16 @@ export const site = {
       countryEn: "Serbia",
     },
     production: {
+      /** As listed on Google Maps. */
+      name: "PG Đurđević",
       city: "Pećinci",
       region: "Srem, Vojvodina",
+      /**
+       * Google Maps embed for that listing (Maps → Share → Embed a map).
+       * {lang} is replaced with the page language.
+       */
+      mapEmbed:
+        "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2826.702785896419!2d19.9873952!3d44.888697099999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475a4fda06296543%3A0xbcfd7fa6933d084d!2zUEcgxJB1csSRZXZpxIc!5e1!3m2!1s{lang}!2srs!4v1790958731517!5m2!1s{lang}!2srs",
     },
   },
 

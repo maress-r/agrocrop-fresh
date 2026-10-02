@@ -35,6 +35,15 @@ export interface ProductionStep {
   paragraphs: string[];
 }
 
+/** One phase of the logistics story (section 05), in order. */
+export interface LogisticsStep {
+  id: 'pack' | 'cold' | 'export';
+  /** Short name — the phase's stop on the process line. */
+  label: string;
+  title: string;
+  text: string;
+}
+
 /** Callouts in the production illustration (components/ProductionScene.astro). */
 export type SceneLabel =
   | 'priva'
@@ -51,7 +60,7 @@ export type SceneLabel =
   | 'nutrients'
   | 'toPlants';
 
-/** A beneficial-organism system from Biobest (facts from the product pages). */
+/** A beneficial-organism system used in biological protection. */
 export interface BeneficialItem {
   id: 'propylea' | 'orius' | 'swirskii' | 'micromus';
   name: string;
@@ -82,6 +91,7 @@ export interface Dictionary {
     production: string;
     products: string;
     quality: string;
+    logistics: string;
     gallery: string;
     contact: string;
     cta: string;
@@ -151,7 +161,6 @@ export interface Dictionary {
       title: string;
       intro: string;
       targetLabel: string;
-      source: string;
       items: BeneficialItem[];
     };
     treatments: {
@@ -166,11 +175,16 @@ export interface Dictionary {
       items: StandardItem[];
     };
   };
+  /** Section 05, told as one journey: packing → cold chain → export. */
   logistics: {
     kicker: string;
     title: string;
     lede: string;
-    points: Pillar[];
+    /** Caption on the packing-centre photograph: what it is, and its floor area. */
+    hall: { label: string; area: string };
+    /** Accessible name of the process line. */
+    stepsLabel: string;
+    steps: LogisticsStep[];
   };
   gallery: {
     kicker: string;
@@ -199,6 +213,8 @@ export interface Dictionary {
     hqHeading: string;
     productionHeading: string;
     productionValue: string;
+    /** Accessible name of the map of the production and distribution centre. */
+    mapTitle: string;
   };
   footer: {
     tagline: string;

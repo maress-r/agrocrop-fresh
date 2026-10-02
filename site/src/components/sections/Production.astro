@@ -6,7 +6,7 @@ import HeatChart from '../HeatChart.astro';
 import { getDictionary, localePath, type Locale } from '../../i18n';
 
 import cropPhoto from '../../assets/photos/babura-5.jpg';
-import aerialPhoto from '../../assets/photos/aerial-haze-2.jpg';
+import aerialPhoto from '../../assets/photos/aerial-haze-3.jpg';
 
 interface Props {
   locale: Locale;
@@ -31,7 +31,7 @@ const rawValue = (v: string) => v.replace(/[.,\s]/g, '');
 const cropAlt =
   locale === 'sr' ? 'Babura u redovima plastenika' : 'Babura along the greenhouse rows';
 const aerialAlt =
-  locale === 'sr' ? 'Redovi plastenika u svitanje' : 'Rows of greenhouses at dawn';
+  locale === 'sr' ? 'Plastenici u jutarnjem svetlu' : 'Greenhouses in the morning light';
 ---
 
 <section id="production" class="section-pad overflow-x-clip bg-forest-900 text-cream-50">
@@ -169,8 +169,7 @@ const aerialAlt =
           alt={aerialAlt}
           widths={[640, 1000, 1440, 2000]}
           sizes="(min-width: 90rem) 82rem, 92vw"
-          class="h-full w-full scale-[1.08] object-cover"
-          data-parallax="4"
+          class="h-full w-full object-cover"
         />
       </figure>
 
@@ -485,16 +484,21 @@ const aerialAlt =
     }
   }
 
-  /* ── Scale: the numbers over the greenhouses from the air ──────── */
+  /* ── Scale: every greenhouse from the air, the numbers beneath ─── */
 
+  /* The whole frame, uncropped, so the full complex stays in view. Its
+     foreground field melts into the section and carries the heading. */
   .scale-photo {
     overflow: hidden;
-    border-radius: 1rem;
-    aspect-ratio: 16 / 10;
+    border-radius: 1rem 1rem 0 0;
+    aspect-ratio: 16 / 9;
+    -webkit-mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 85%, transparent 100%);
   }
 
   .scale-body {
-    margin-top: 2.5rem;
+    position: relative;
+    margin-top: -5.5%;
   }
 
   .scale-stats {
@@ -529,47 +533,12 @@ const aerialAlt =
   }
 
   @media (min-width: 64rem) {
-    .scale {
-      position: relative;
-    }
-
     .scale-photo {
-      aspect-ratio: 21 / 9;
-      border-radius: 1.25rem;
-    }
-
-    /* Legible over the photo: a forest wash rising from the bottom. */
-    .scale-photo::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        to top,
-        color-mix(in srgb, var(--color-forest-950) 92%, transparent) 0%,
-        color-mix(in srgb, var(--color-forest-950) 55%, transparent) 38%,
-        transparent 72%
-      );
-      pointer-events: none;
-    }
-
-    .scale-photo {
-      position: relative;
-    }
-
-    .scale-body {
-      position: absolute;
-      inset: auto 0 0;
-      margin: 0;
-      padding: 0 clamp(2rem, 4vw, 3.5rem) clamp(2rem, 3.5vw, 3rem);
+      border-radius: 1.25rem 1.25rem 0 0;
     }
 
     .scale-stats {
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      margin-top: 1.75rem;
-    }
-
-    .scale-stat {
-      border-color: color-mix(in srgb, var(--color-cream-50) 22%, transparent);
     }
   }
 </style>

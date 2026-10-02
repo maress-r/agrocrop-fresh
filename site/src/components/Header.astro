@@ -16,6 +16,7 @@ const links = [
   { href: `${home}#production`, label: t.nav.production },
   { href: `${home}#products`, label: t.nav.products },
   { href: `${home}#quality`, label: t.nav.quality },
+  { href: `${home}#logistics`, label: t.nav.logistics },
   { href: `${home}#gallery`, label: t.nav.gallery },
   { href: `${home}#contact`, label: t.nav.contact },
 ];
@@ -56,10 +57,12 @@ const links = [
         {t.a11y.langSwitchShort}
       </a>
 
-      {/* Beside the full navigation only once both fit on one line. */}
+      {/* Hidden on phones (the menu has its own) and, beside the full navigation,
+          until both fit on one line. Variants, not a bare `hidden`: the button's
+          own display utility would win over it. */}
       <Button
         href={`${home}#contact`}
-        class="hidden whitespace-nowrap md:inline-flex lg:hidden min-[70rem]:inline-flex"
+        class="whitespace-nowrap max-md:hidden lg:max-[76rem]:hidden"
       >
         {t.nav.cta}
       </Button>
@@ -88,6 +91,7 @@ const links = [
     role="dialog"
     aria-modal="true"
     aria-label="Menu"
+    data-lenis-prevent
     inert
   >
     <nav class="container-site flex flex-col gap-1" aria-label="Mobile">
@@ -168,6 +172,31 @@ const links = [
   }
   :global(#site-header.menu-open) .menu-bar:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
+  }
+
+  /* Every link and the button fit shorter phones; scrolling is the last resort. */
+  #mobile-menu {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  @media (max-height: 46rem) {
+    #mobile-menu {
+      padding-top: 5.5rem;
+      padding-bottom: 1.5rem;
+    }
+
+    #mobile-menu nav a {
+      padding-block: 0.625rem;
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (max-height: 36rem) {
+    #mobile-menu nav a {
+      padding-block: 0.4375rem;
+      font-size: 1.375rem;
+    }
   }
 
   /* Without motion preference, no reveal transitions inside menu */
