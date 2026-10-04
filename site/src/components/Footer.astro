@@ -50,8 +50,8 @@ const links = [
         }
       </nav>
 
-      <!-- Contact -->
-      <div class="flex flex-col gap-4">
+      <!-- Contact (from md up: on phones it would repeat the Contact section just above) -->
+      <div class="flex flex-col gap-4 max-md:hidden">
         <h2 class="kicker mb-2 text-sage-300/70">{t.footer.contactHeading}</h2>
         {
           site.contacts.map((c) => (
